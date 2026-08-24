@@ -10,8 +10,8 @@ Created on Sun Aug 13 19:40:08 2023
 import os
 import pandas as pd
 import numpy as np
-import sklearn.metrics as skm # similarity metrics
-import scipy.spatial.distance as sc # distance metrics
+import sklearn.metrics as sklearn_metrics # similarity metrics
+import scipy.spatial.distance as scipy_spatial_distance # distance metrics
 
 #%% Import data
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -58,7 +58,7 @@ datan_binarizado = data_seleccionada.copy()
 # tomamos <datan_binarizado.iloc[1,:]>, que son las calificaciones de Walky (usuario 1).
 # Lo hacemos para determinar la similitud entre ambos, En los siguientes renglones sacaremos 2
 # diferentes índices de similitud.
-cf_m = skm.confusion_matrix(datan_binarizado.iloc[0,:],datan_binarizado.iloc[1,:])
+cf_m = sklearn_metrics.confusion_matrix(datan_binarizado.iloc[0,:],datan_binarizado.iloc[1,:])
 
 # Aquí usamos la similitud simple
 # Sean:
@@ -67,13 +67,13 @@ cf_m = skm.confusion_matrix(datan_binarizado.iloc[0,:],datan_binarizado.iloc[1,:
 # - c = registros ciertos en A y falsos en B
 # - d = registros ciertos en A y B
 # La similitud simple es (a + b) / (a+b+c+d) (aciertos / total)
-sim_simple = skm.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+sim_simple = sklearn_metrics.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
 #sim_simple_new = (cf_m[0,0]+cf_m[1,1])/np.sum(cf_m)
 print('Simple : %0.4f'%sim_simple)
 
 # Índice de Jaccard: d / (b+c+d) - películas que gustan a ambos / total excluyendo las que no gustan
 # Esto limita la similitud a únicamente casos positivos; 
-sim_jac = skm.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+sim_jac = sklearn_metrics.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
 sim_jac = (cf_m[0,0])/(np.sum(cf_m)-cf_m[1,1])
 print('Jaccard: %0.4f'%sim_jac)
 
@@ -85,7 +85,7 @@ cf_m_binaria = cf_m
 #%% Calculation of distances by scipy
 # https://docs.scipy.org/doc/scipy/reference/spatial.distance.html
 # Sacamos 2 tipos de distancia: el teorema de Pitágoras (euclidiana), y la distancia Canberra
-d1 = sc.euclidean(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
+d1 = scipy_spatial_distance.euclidean(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
 print('Simple : %0.4f'%d1)
 # La distancia Canberra es una variante ponderada de la distancia Manhattan. Sean p = (p1, ..., pn)
 # y q = (q1, q2, ..., qn) 2 vectores en R^n; su distancia Canberra es:
@@ -93,15 +93,15 @@ print('Simple : %0.4f'%d1)
 # Dividir entre la suma de las dimensiones hace que la distancia calculada varíe mucho cuando las
 # dimensiones son muy pequeñas y cercanas al 0 (ya que dividir entre algo muy pequeño da algo muy
 # grande), lo que permite detectar cambios minúsculos en dimensiones pequeñas.
-d2 = sc.canberra(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
+d2 = scipy_spatial_distance.canberra(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
 print('Canberra: %0.4f'%d2)
 
 #%% Calculate all possible combinations by scipy
-D1 = sc.pdist(data_seleccionada,'matching')
-D1 = sc.squareform(D1)
+D1 = scipy_spatial_distance.pdist(data_seleccionada,'matching')
+D1 = scipy_spatial_distance.squareform(D1)
 
-D2 = sc.pdist(data_seleccionada,'jaccard')
-D2 = sc.squareform(D2)
+D2 = scipy_spatial_distance.pdist(data_seleccionada,'jaccard')
+D2 = scipy_spatial_distance.squareform(D2)
 
 #%% Select a user and determine the other most similar user
 user = 1
@@ -140,11 +140,11 @@ data_seleccionada.head()
 data_seleccionada.fillna(0,inplace=True)
 
 #%% Multistate similarity metrics
-cf_m = skm.confusion_matrix(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
-sim_simple = skm.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
-#sim_simple = skm.accuracy_score(datan.iloc[0,:],datan.iloc[1,:],average='weighted') # old versions
+cf_m = sklearn_metrics.confusion_matrix(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+sim_simple = sklearn_metrics.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+#sim_simple = sklearn_metrics.accuracy_score(datan.iloc[0,:],datan.iloc[1,:],average='weighted') # old versions
 print('Simple : %0.4f'%sim_simple)
-sim_jac = skm.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:],average='weighted')
+sim_jac = sklearn_metrics.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:],average='weighted')
 print('Jaccard : %0.4f'%sim_jac)
 
 
@@ -168,14 +168,14 @@ data_seleccionada.head()
 data_seleccionada.fillna(0,inplace=True)
 
 #%% Euclidean Distance
-D1 = sc.pdist(data_seleccionada,'euclidean')
-D1 = sc.squareform(D1)
+D1 = scipy_spatial_distance.pdist(data_seleccionada,'euclidean')
+D1 = scipy_spatial_distance.squareform(D1)
 
 #%% Cosine Distance
-D2 = sc.pdist(data_seleccionada,'cosine')
-D2 = sc.squareform(D2)
+D2 = scipy_spatial_distance.pdist(data_seleccionada,'cosine')
+D2 = scipy_spatial_distance.squareform(D2)
 
 #%% Correlation Distance
-D3 = sc.pdist(data_seleccionada,'correlation')
-D3 = sc.squareform(D3)
+D3 = scipy_spatial_distance.pdist(data_seleccionada,'correlation')
+D3 = scipy_spatial_distance.squareform(D3)
 # %%
