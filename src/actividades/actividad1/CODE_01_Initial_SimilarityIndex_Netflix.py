@@ -21,6 +21,9 @@ data = pd.read_excel(file_path,index_col=0)
 data.head()
 
 #%% Sel7ect columns
+# Seleccionamos cada 3 columnas a partir de la columna 9, ya que el acomodo de la tabla es
+# <título de la película con las calificaciones que cada usuario puso> - <puntos> - <comentarios>
+# Y de ahí sólo nos importan las calificaciones
 def select_columns(x):
   csel = np.arange(9,246,3)
   users1 = list(x.iloc[:,6])
@@ -30,48 +33,74 @@ def select_columns(x):
   
   return x
 
-datan =  select_columns(data)
-datan.head()
+data_seleccionada =  select_columns(data)
+data_seleccionada.head()
 
 
 #%% Average rating of the movies
-movie_prom = datan.mean(axis=0)
-user_prom = datan.mean(axis=1)
+# Sacamos unas estadísticas básicas: el promedio de calificación de cada película, y el de cada 
+# persona (nos interesa saber si alguien es pesimista)
+movie_prom = data_seleccionada.mean(axis=0)
+user_prom = data_seleccionada.mean(axis=1)
 
 #%% Change the stars to like or dislike
-cnames = list(datan.columns.values)
-fnames = np.array(datan.index)
+# Convertimos los datos a binario: tomamos como like una calificación de 4 o más
+cnames = list(data_seleccionada.columns.values)
+fnames = np.array(data_seleccionada.index)
 for col in cnames:
-    datan[col]=np.where(datan[col]>3,1,0)
-datan.head()
-    
+    data_seleccionada[col]=np.where(data_seleccionada[col]>3,1,0)
+data_seleccionada.head()
+datan_binarizado = data_seleccionada.copy()
 
 #%% Calculate similarity indices in users by sklearn
-cf_m = skm.confusion_matrix(datan.iloc[0,:],datan.iloc[1,:])
+# Usamos para eso los likes de datan_binarizado. Tomamos <datan_binarizado.iloc[0,:]>, que son las
+# calificaciones del usuario 0 (Mary11), como el conjunto "verdadero"; y como el conjunto "predicho"
+# tomamos <datan_binarizado.iloc[1,:]>, que son las calificaciones de Walky (usuario 1).
+# Lo hacemos para determinar la similitud entre ambos, En los siguientes renglones sacaremos 2
+# diferentes índices de similitud.
+cf_m = skm.confusion_matrix(datan_binarizado.iloc[0,:],datan_binarizado.iloc[1,:])
 
-sim_simple = skm.accuracy_score(datan.iloc[0,:],datan.iloc[1,:])
+# Aquí usamos la similitud simple
+# Sean:
+# - a = registros falsos en A y B
+# - b = registros falsos en A y ciertos en B
+# - c = registros ciertos en A y falsos en B
+# - d = registros ciertos en A y B
+# La similitud simple es (a + b) / (a+b+c+d) (aciertos / total)
+sim_simple = skm.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
 #sim_simple_new = (cf_m[0,0]+cf_m[1,1])/np.sum(cf_m)
 print('Simple : %0.4f'%sim_simple)
 
-sim_jac = skm.jaccard_score(datan.iloc[0,:],datan.iloc[1,:])
+# Índice de Jaccard: d / (b+c+d) - películas que gustan a ambos / total excluyendo las que no gustan
+# Esto limita la similitud a únicamente casos positivos; 
+sim_jac = skm.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
 sim_jac = (cf_m[0,0])/(np.sum(cf_m)-cf_m[1,1])
 print('Jaccard: %0.4f'%sim_jac)
+
+cf_m_binaria = cf_m
 
 # Tip for those who have a different syntax
 # conda update sklearn
 
 #%% Calculation of distances by scipy
 # https://docs.scipy.org/doc/scipy/reference/spatial.distance.html
-d1 = sc.euclidean(datan.iloc[0,:],datan.iloc[5,:])
+# Sacamos 2 tipos de distancia: el teorema de Pitágoras (euclidiana), y la distancia Canberra
+d1 = sc.euclidean(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
 print('Simple : %0.4f'%d1)
-d2 = sc.canberra(datan.iloc[0,:],datan.iloc[5,:])
-print('canberra: %0.4f'%d2)
+# La distancia Canberra es una variante ponderada de la distancia Manhattan. Sean p = (p1, ..., pn)
+# y q = (q1, q2, ..., qn) 2 vectores en R^n; su distancia Canberra es:
+#    d(p,q) = sum for i = 1 to n of [ abs(p[i] - q[i]) / ( abs(p[i]) + abs(q[i]) ) ]
+# Dividir entre la suma de las dimensiones hace que la distancia calculada varíe mucho cuando las
+# dimensiones son muy pequeñas y cercanas al 0 (ya que dividir entre algo muy pequeño da algo muy
+# grande), lo que permite detectar cambios minúsculos en dimensiones pequeñas.
+d2 = sc.canberra(data_seleccionada.iloc[0,:],data_seleccionada.iloc[5,:])
+print('Canberra: %0.4f'%d2)
 
 #%% Calculate all possible combinations by scipy
-D1 = sc.pdist(datan,'matching')
+D1 = sc.pdist(data_seleccionada,'matching')
 D1 = sc.squareform(D1)
 
-D2 = sc.pdist(datan,'jaccard')
+D2 = sc.pdist(data_seleccionada,'jaccard')
 D2 = sc.squareform(D2)
 
 #%% Select a user and determine the other most similar user
@@ -82,8 +111,8 @@ indx_user = np.argsort(D_user)
 
 
 #%% Recommendation version 1. The most similar user
-User = datan.loc[fnames[user]]
-User_sim = datan.loc[fnames[indx_user[1]]]
+User = data_seleccionada.loc[fnames[user]]
+User_sim = data_seleccionada.loc[fnames[indx_user[1]]]
 
 indx_recomen = (User_sim ==1)&(User==0)
 recomend1 = list(User.index[indx_recomen])
@@ -94,8 +123,8 @@ print(recomend1)
 
 #%% Recommendation version 2. The k most similar users
 k = 5
-User = datan.loc[fnames[user]]
-User_sim = np.mean(datan.loc[fnames[indx_user[1:k+1]]],axis=0)
+User = data_seleccionada.loc[fnames[user]]
+User_sim = np.mean(data_seleccionada.loc[fnames[indx_user[1:k+1]]],axis=0)
 User_sim[User_sim<=0.5] = 0
 User_sim[User_sim>0.5] = 1
 
@@ -106,47 +135,47 @@ print(recomend2)
 
 
 #%% SIMILARITY WITH MULTISTATE VARIABLES
-datan =  select_columns(data)
-datan.head()
-datan.fillna(0,inplace=True)
+data_seleccionada =  select_columns(data)
+data_seleccionada.head()
+data_seleccionada.fillna(0,inplace=True)
 
 #%% Multistate similarity metrics
-cf_m = skm.confusion_matrix(datan.iloc[0,:],datan.iloc[1,:])
-sim_simple = skm.accuracy_score(datan.iloc[0,:],datan.iloc[1,:])
+cf_m = skm.confusion_matrix(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+sim_simple = skm.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
 #sim_simple = skm.accuracy_score(datan.iloc[0,:],datan.iloc[1,:],average='weighted') # old versions
 print('Simple : %0.4f'%sim_simple)
-sim_jac = skm.jaccard_score(datan.iloc[0,:],datan.iloc[1,:],average='weighted')
+sim_jac = skm.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:],average='weighted')
 print('Jaccard : %0.4f'%sim_jac)
 
 
 #%% GENERATION OF AUXILIARY VARIABLES
 
 # Example of a single variable
-dummy1 = pd.get_dummies(datan[cnames[1]])
+dummy1 = pd.get_dummies(data_seleccionada[cnames[1]])
 # dummy1 = pd.get_dummies(datan[cnames[1]],prefix=cnames[1])
 
 #%% Example with users of the entire table
-datan_dummy = pd.get_dummies(datan[cnames[0]],prefix=cnames[0])
+datan_dummy = pd.get_dummies(data_seleccionada[cnames[0]],prefix=cnames[0])
 for col in cnames[1:]:
-    tmp = pd.get_dummies(datan[col],prefix=col)
+    tmp = pd.get_dummies(data_seleccionada[col],prefix=col)
     datan_dummy = datan_dummy.join(tmp)
 del tmp
 
 
 #%% DISTANCES WITH QUANTITATIVE VARIABLES
-datan =  select_columns(data)
-datan.head()
-datan.fillna(0,inplace=True)
+data_seleccionada =  select_columns(data)
+data_seleccionada.head()
+data_seleccionada.fillna(0,inplace=True)
 
 #%% Euclidean Distance
-D1 = sc.pdist(datan,'euclidean')
+D1 = sc.pdist(data_seleccionada,'euclidean')
 D1 = sc.squareform(D1)
 
 #%% Cosine Distance
-D2 = sc.pdist(datan,'cosine')
+D2 = sc.pdist(data_seleccionada,'cosine')
 D2 = sc.squareform(D2)
 
 #%% Correlation Distance
-D3 = sc.pdist(datan,'correlation')
+D3 = sc.pdist(data_seleccionada,'correlation')
 D3 = sc.squareform(D3)
 # %%
