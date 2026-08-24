@@ -251,4 +251,8 @@ distancias_cosenosimilitud = scipy_spatial_distance.squareform(distancias_coseno
 #%% Correlation Distance
 distancias_correlacion = scipy_spatial_distance.pdist(data_seleccionada,'correlation')
 distancias_correlacion = scipy_spatial_distance.squareform(distancias_correlacion)
+
 # %%
+# -- Tarea 1: Dado el código anterior, implemente un código que recomiende una película a un usuario
+
+
