@@ -97,13 +97,30 @@ d2 = scipy_spatial_distance.canberra(data_seleccionada.iloc[0,:],data_selecciona
 print('Canberra: %0.4f'%d2)
 
 #%% Calculate all possible combinations by scipy
+# Sacamos aquí la distancia entre pares de elementos
+# scipy.spatial.distance.pdist() recibe un arreglo de M x N que representa M observaciones de N
+# dimensiones, y tira una matriz de distancias. Cada fila representa una observación, y cada columna
+# representa la distancia de nuestra observación a las demás. La matriz es cuadrada de M x M porque
+# ésta representa la distancia de M observaciones hacia las demás M observaciones. La diagonal
+# siempre es 0, porque cada item de la diagonal representa la distancia de un elemento a sí mismo.
+# Para este cálculo de distancia vamos a usar la distancia Hamming, que es la cantidad de valores
+# diferentes entre cada elemento; es óptima para datos binarios, como data_seleccionada binarizada.
+# Fuente: https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist
 D1 = scipy_spatial_distance.pdist(data_seleccionada,'matching')
+# pdist() no tira por sí mismo la matriz de distancia, sino que tira un vector de M^2 observaciones
+# Entonces, para tener la matriz de distancia en forma cuadrada, necesitamos squareform(). No es
+# necesario proveer el tamaño, porque sabemos que las matrices de distancia siempre son cuadradas
+# y por lo tanto la dimensión es la raíz cuadrada de la longitud del vector de observaciones.
 D1 = scipy_spatial_distance.squareform(D1)
 
+# Idem, pero con distancia de Jaccard
 D2 = scipy_spatial_distance.pdist(data_seleccionada,'jaccard')
 D2 = scipy_spatial_distance.squareform(D2)
 
 #%% Select a user and determine the other most similar user
+# Con esa matriz de distancias, sacamos un usuario y sacamos las distancias respecto a los demás
+# usuarios. Sacamos también con numpy.argsort() los índices de las distancias de los demás respecto
+# al usuario <user> en orden ascendente.
 user = 1
 D_user = D1[user]
 D_user_sort = np.sort(D_user)
@@ -111,10 +128,24 @@ indx_user = np.argsort(D_user)
 
 
 #%% Recommendation version 1. The most similar user
+# Sacamos un usuario. Primero sacamos su username de fnames (lo sacamos al principio del código), 
+# eso lo metemos al pseudoarreglo DataFrame.loc[] que sirve para obtener items a través de su 
+# nombre. Con ese mismo método, sacamos de indx_user[] el índice del usuario más similar, que es el 
+# #1 porque el #0 siempre va a ser sí mismo. Convertimos eso a nombre de usuario con fnames[], y de 
+# ahí sacamos sus datos con data_seleccionada.loc[].
+# Tanto User como User_similar son DFs de una columna, y cada fila tiene el nombre de una película 
+# como índice y si al usuario le gustó como valor.
 User = data_seleccionada.loc[fnames[user]]
-User_sim = data_seleccionada.loc[fnames[indx_user[1]]]
+User_similar = data_seleccionada.loc[fnames[indx_user[1]]]
+User_version1 = User.copy()
 
-indx_recomen = (User_sim ==1)&(User==0)
+# Convertimos las preferencias de User_similar a True/False donde True significa "1" (like), y 
+# las de User a True/False donde True significa 0 (no like). Esto nos da las películas que User
+# no le ha puesto al menos 4 estrellas (lo que incluye las que no ha visto) y que User_similar sí
+# le ha dado al menos 4 en forma de un DataFrame booleano con índices.
+# Y con eso acabo de sacar las películas qué recomendar a User.
+indx_recomen = (User_similar ==1)&(User==0)
+# Ahora que tengo ese dato, saco los índices de las películas que dieron True y las tiro.
 recomend1 = list(User.index[indx_recomen])
 print('\n Movie list recommended:\n')
 print(recomend1)
@@ -122,13 +153,24 @@ print(recomend1)
 
 
 #%% Recommendation version 2. The k most similar users
+# Ahora sigue la variante 2: sacar los k usuarios más similares. En las redes sociales esto sirve
+# para sacar qué posts mostrar. Vamos a sacar k=5.
 k = 5
+# Comenzamos sacando a nuestro User
 User = data_seleccionada.loc[fnames[user]]
-User_sim = np.mean(data_seleccionada.loc[fnames[indx_user[1:k+1]]],axis=0)
-User_sim[User_sim<=0.5] = 0
-User_sim[User_sim>0.5] = 1
+User_version2 = User.copy()  # Guardamos una copia del usuario para verla en Data Wrangler
+# Tomamos los top K usuarios más similares a nuestro User y sacamos sus películas
+Usernames_similares_topK = fnames[indx_user[1:k+1]]
+Usernames_similares_topK_peliculas = data_seleccionada.loc[Usernames_similares_topK]
+# Agregamos las similitudes a través del promedio
+User_similar = np.mean(Usernames_similares_topK_peliculas,axis=0)
+User_similar_promedio_top5 = User_similar.copy()
+# Los promedios que sean menores o iguales a 0.5 los hacemos 0, los mayores a eso los hacemos 1
+User_similar[User_similar<=0.5] = 0
+User_similar[User_similar>0.5] = 1
 
-indx_recomen = (User_sim ==1)&(User==0)
+# Terminamos sacando las recomendaciones con el mismo proceso que la vez pasada
+indx_recomen = (User_similar ==1)&(User==0)
 recomend2 = list(User.index[indx_recomen])
 print('\n Movie list recommended:\n')
 print(recomend2)
@@ -138,6 +180,7 @@ print(recomend2)
 data_seleccionada =  select_columns(data)
 data_seleccionada.head()
 data_seleccionada.fillna(0,inplace=True)
+data_seleccionada_narellenado = data_seleccionada.copy()
 
 #%% Multistate similarity metrics
 cf_m = sklearn_metrics.confusion_matrix(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
