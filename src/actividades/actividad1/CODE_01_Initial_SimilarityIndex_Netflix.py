@@ -35,6 +35,7 @@ def select_columns(x):
 
 data_seleccionada =  select_columns(data)
 data_seleccionada.head()
+data_seleccionada_original = data_seleccionada.copy()
 
 
 #%% Average rating of the movies
@@ -45,9 +46,9 @@ user_prom = data_seleccionada.mean(axis=1)
 
 #%% Change the stars to like or dislike
 # Convertimos los datos a binario: tomamos como like una calificación de 4 o más
-cnames = list(data_seleccionada.columns.values)
+nombres_de_columnas = list(data_seleccionada.columns.values)
 fnames = np.array(data_seleccionada.index)
-for col in cnames:
+for col in nombres_de_columnas:
     data_seleccionada[col]=np.where(data_seleccionada[col]>3,1,0)
 data_seleccionada.head()
 datan_binarizado = data_seleccionada.copy()
@@ -177,16 +178,30 @@ print(recomend2)
 
 
 #%% SIMILARITY WITH MULTISTATE VARIABLES
+# Nuestros datos seleccionados originalmente tienen un "NA" de PANDAS para denotar ausencia de
+# calificación. Para los siguientes cálculos, es necesario rellenar esos NA con un número. Dado que
+# nuestras estrellas son de 1 a 5, podemos usar el 0.
 data_seleccionada =  select_columns(data)
 data_seleccionada.head()
 data_seleccionada.fillna(0,inplace=True)
 data_seleccionada_narellenado = data_seleccionada.copy()
 
 #%% Multistate similarity metrics
-cf_m = sklearn_metrics.confusion_matrix(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
-sim_simple = sklearn_metrics.accuracy_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:])
+usuario_1 = data_seleccionada.iloc[0,:]
+usuario_2 = data_seleccionada.iloc[1,:]
+
+# Ahora nuestra matriz de confusión ya no es 2 x 2, sino 6 x 6, ¿por qué? porque ahora tenemos una
+# variable aleatoria X = { 0,1,2,3,4,5 }. Entonces, ahora cada celda [fila, columna] de la matriz
+# de confusión significa cuántas películas tuvieron calificación <fila> del usuario_1 y calificación
+# <columna> del usuario_2.
+cf_m = sklearn_metrics.confusion_matrix(usuario_1, usuario_2)
+# Y ahora el accuracy score se saca dividiendo la sumatoria de la diagonal entre la sumatoria de 
+# la matriz entera. Es decir, eso me da el porcentaje de películas que fueron calificadas igual por
+# ambos usuarios.
+sim_simple = sklearn_metrics.accuracy_score(usuario_1, usuario_2)
 #sim_simple = sklearn_metrics.accuracy_score(datan.iloc[0,:],datan.iloc[1,:],average='weighted') # old versions
 print('Simple : %0.4f'%sim_simple)
+# Comparamos eso con el índice de Jaccard
 sim_jac = sklearn_metrics.jaccard_score(data_seleccionada.iloc[0,:],data_seleccionada.iloc[1,:],average='weighted')
 print('Jaccard : %0.4f'%sim_jac)
 
@@ -194,31 +209,46 @@ print('Jaccard : %0.4f'%sim_jac)
 #%% GENERATION OF AUXILIARY VARIABLES
 
 # Example of a single variable
-dummy1 = pd.get_dummies(data_seleccionada[cnames[1]])
+# Vamos ahora a generar variables dummy. Tomamos para eso la columna de las calificaciones que tiene
+# una de las películas.
+calificaciones_de_una_peli = data_seleccionada[nombres_de_columnas[1]]
+# Sea X una lista de los resultados de una var aleatoria discreta de valores X = { 1, 2, ..., n }. 
+# Una tabla dummy es una tabla cuyas filas son uno de los resultados de la variable, y cuyas
+# columnas 1, 2, ..., n indican si el valor de la variable fue 1, 2, ..., n.
+dummy1 = pd.get_dummies(calificaciones_de_una_peli)
 # dummy1 = pd.get_dummies(datan[cnames[1]],prefix=cnames[1])
 
 #%% Example with users of the entire table
-datan_dummy = pd.get_dummies(data_seleccionada[cnames[0]],prefix=cnames[0])
-for col in cnames[1:]:
+# Aquí vamos a desdoblar las calificaciones que cada usuario le dio a las películas en forma de
+# tabla dummy. Comenzamos con un primer saque, las calificaciones de la primera película.
+# prefix aquí añade el nombre de la película a la columna. El resultado es una tabla que dice
+# con True/False quiénes le dieron 0 a la película 0, quiénes le dieron 1 a la peli 0, &c.
+datan_dummy = pd.get_dummies(data_seleccionada[nombres_de_columnas[0]],prefix=nombres_de_columnas[0])
+# Hacemos lo mismo con el resto de las películas y pegamos eso al final de las columnas
+for col in nombres_de_columnas[1:]:
     tmp = pd.get_dummies(data_seleccionada[col],prefix=col)
     datan_dummy = datan_dummy.join(tmp)
 del tmp
 
 
 #%% DISTANCES WITH QUANTITATIVE VARIABLES
+# Ahora probamos sacando la matriz de distancia con diferentes métricas. Volvemos a sacar nuestra
+# data_seleccionada para eso
 data_seleccionada =  select_columns(data)
 data_seleccionada.head()
 data_seleccionada.fillna(0,inplace=True)
 
 #%% Euclidean Distance
-D1 = scipy_spatial_distance.pdist(data_seleccionada,'euclidean')
-D1 = scipy_spatial_distance.squareform(D1)
+distancias_pitagoras = scipy_spatial_distance.pdist(data_seleccionada,'euclidean')
+distancias_pitagoras = scipy_spatial_distance.squareform(distancias_pitagoras)
 
 #%% Cosine Distance
-D2 = scipy_spatial_distance.pdist(data_seleccionada,'cosine')
-D2 = scipy_spatial_distance.squareform(D2)
+# Aquí aplicamos el coseno de similitud
+# Esto se saca con el coseno del ángulo entre vectores, donde cada vector es una de las filas
+distancias_cosenosimilitud = scipy_spatial_distance.pdist(data_seleccionada,'cosine')
+distancias_cosenosimilitud = scipy_spatial_distance.squareform(distancias_cosenosimilitud)
 
 #%% Correlation Distance
-D3 = scipy_spatial_distance.pdist(data_seleccionada,'correlation')
-D3 = scipy_spatial_distance.squareform(D3)
+distancias_correlacion = scipy_spatial_distance.pdist(data_seleccionada,'correlation')
+distancias_correlacion = scipy_spatial_distance.squareform(distancias_correlacion)
 # %%
