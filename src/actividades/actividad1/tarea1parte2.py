@@ -295,5 +295,71 @@ print(f"Recomendación para el usuario {fnames[5]} (correlación Pearson): {reco
 
 
 # %%
-# -- Tarea 1 parte 2: Usar los resultados de la encuesta para encontrar el usuario más similar a 
-# usted y 
+# -- Tarea 1 parte 2: Usar los resultados de la encuesta para encontrar el usuario más similar a
+# usted y el usuario más diferente, tanto en general como dentro de su propio semestre.
+MI_ALIAS = 'Acoyani Garrido Sandoval'
+
+#%% Import de la encuesta
+encuesta_path = os.path.join(script_dir, 'Predictive Modeling _ Survey.xlsx')
+encuesta = pd.read_excel(encuesta_path)
+
+#%% Selección de las columnas de preguntas Sí/No
+# La tabla trae, por cada pregunta, 3 columnas: la pregunta en sí, sus puntos ("Points - ...") y su
+# retroalimentación ("Feedback - ..."). De ésas, sólo nos interesan las columnas con la pregunta.
+columnas_metadata = ['ID', 'Start time', 'Completion time', 'Email', 'Name', 'Total points',
+                      'Quiz feedback', 'Last modified time', 'Alias']
+columnas_preguntas = [c for c in encuesta.columns
+                       if c not in columnas_metadata
+                       and not c.startswith('Points -')
+                       and not c.startswith('Feedback -')]
+
+#%% Convertir Sí/No a 1/0, e indexar por Alias
+encuesta_binaria = encuesta[columnas_preguntas].apply(lambda col: col.map({'Yes': 1, 'No': 0}))
+encuesta_binaria.index = encuesta['Alias']
+
+#%% Determinar en qué semestre respondió cada quien la encuesta
+# ITESO tiene 2 semestres al año: Otoño (agosto-diciembre) y Primavera (enero-mayo). Usamos el mes
+# de la fecha de inicio de cada respuesta para agrupar a cada persona en su semestre.
+def obtener_semestre(fecha):
+    periodo = 'Otono' if fecha.month >= 7 else 'Primavera'
+    return f'{fecha.year}-{periodo}'
+
+semestre_por_alias = encuesta['Start time'].apply(obtener_semestre)
+semestre_por_alias.index = encuesta['Alias']
+
+#%% Ubicar mi respuesta y mi semestre
+mi_indice = encuesta_binaria.index.get_loc(MI_ALIAS)
+mi_semestre = semestre_por_alias.iloc[mi_indice]
+
+#%% Matriz de distancias entre todos los encuestados
+# Usamos la distancia de emparejamiento (matching), que es el porcentaje de preguntas en las que 2
+# personas respondieron diferente. Entre menor sea, más similares son; entre mayor, más diferentes.
+D_encuesta = scipy_spatial_distance.pdist(encuesta_binaria, 'matching')
+D_encuesta = scipy_spatial_distance.squareform(D_encuesta)
+
+#%% Función para encontrar, dentro de un grupo de candidatos, al más similar y al más diferente
+def usuario_similar_y_diferente(indices_candidatos, distancias_fila, aliases):
+    distancias_candidatos = distancias_fila[indices_candidatos]
+    idx_mas_similar = indices_candidatos[np.argmin(distancias_candidatos)]
+    idx_mas_diferente = indices_candidatos[np.argmax(distancias_candidatos)]
+    return aliases[idx_mas_similar], aliases[idx_mas_diferente]
+
+aliases_encuesta = np.array(encuesta_binaria.index)
+distancias_mi_usuario = D_encuesta[mi_indice]
+
+#%% En general: comparando contra todos los demás encuestados (de cualquier semestre)
+indices_otros_general = np.array([i for i in range(len(aliases_encuesta)) if i != mi_indice])
+similar_general, diferente_general = usuario_similar_y_diferente(
+    indices_otros_general, distancias_mi_usuario, aliases_encuesta)
+
+#%% Este semestre: comparando sólo contra quienes respondieron en mi mismo semestre
+indices_otros_semestre = np.array(
+    [i for i in indices_otros_general if semestre_por_alias.iloc[i] == mi_semestre])
+similar_semestre, diferente_semestre = usuario_similar_y_diferente(
+    indices_otros_semestre, distancias_mi_usuario, aliases_encuesta)
+
+#%% Resultados
+print(f'\nUsuario más similar a mí en general: {similar_general}')
+print(f'Usuario más diferente a mí en general: {diferente_general}')
+print(f'\nUsuario más similar a mí este semestre ({mi_semestre}): {similar_semestre}')
+print(f'Usuario más diferente a mí este semestre ({mi_semestre}): {diferente_semestre}')
