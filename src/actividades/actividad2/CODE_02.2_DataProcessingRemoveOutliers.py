@@ -59,7 +59,7 @@ def plot_scatter_with_outliers(data, outliers_indices, x_col, y_col):
     plt.show()
 #%%
 # Import the dataset
-data = pd.read_csv('../Data/glass/glass.data', header=None, names=['ID','Refractive_index','Na','Mg','Al','Si','K','Ca','Ba','Fe','Glass_type'])
+data = pd.read_csv('glass.data', header=None, names=['ID','Refractive_index','Na','Mg','Al','Si','K','Ca','Ba','Fe','Glass_type'])
 
 # Before removing outliers
 create_boxplot(data['Refractive_index'], "Boxplot - Before Removing Outliers (Original Data)")
