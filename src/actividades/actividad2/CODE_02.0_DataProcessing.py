@@ -293,7 +293,7 @@ fig.tight_layout()
 plt.show()
 
 #%
-data['Mg_index_no_skewness'] = 1/(data.Mg+1)
+data['Mg_index_no_skewness'] = 1/(data.Mg)
 
 fig = plt.figure()
 plt.subplot(1,2,1)
@@ -307,7 +307,8 @@ plt.show()
 #%
 ### BoxCox transformation using scipy
 from scipy import stats
-data['Mg_index_no_skewness'] = stats.boxcox(data.Mg+1,lmbda=2.23672519042031)
+# data['Mg_index_no_skewness'] = stats.boxcox(data.Mg+1,lmbda=2.23672519042031)
+data['Mg_index_no_skewness'] = stats.yeojohnson(data.Mg,lmbda=2.23672519042031)  # Box-Cox sólo funciona con números positivos, hay que usar el Box-Cox mejorado que es Yeo-Johnson
 fig = plt.figure()
 plt.subplot(1,2,1)
 plt.hist(data.Mg)
@@ -318,7 +319,7 @@ plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 #%
-data['Mg_index_no_skewness'],lamb = stats.boxcox(data.Mg+1)
+# data['Mg_index_no_skewness'],lamb = stats.boxcox(data.Mg+1)
 data['Mg_index_no_skewness'],lamb = stats.yeojohnson(data.Mg)
 
 #%%%%% ASYMMETRY IN THE VARIABLES
