@@ -294,7 +294,7 @@ fig.tight_layout()
 plt.show()
 
 #%
-data['Ba_index_no_skewness'] = 1/(data.Ba)
+data['Ba_index_no_skewness'] = 1/(data.Ba+1)
 
 fig = plt.figure()
 plt.subplot(1,2,1)
@@ -302,7 +302,7 @@ plt.hist(data.Ba)
 plt.xlabel('Ba_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
 plt.hist(data.Ba_index_no_skewness)
-plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
+plt.xlabel('Ba_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 #%
