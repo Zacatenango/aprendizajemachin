@@ -363,3 +363,14 @@ print(f'\nUsuario más similar a mí en general: {similar_general}')
 print(f'Usuario más diferente a mí en general: {diferente_general}')
 print(f'\nUsuario más similar a mí este semestre ({mi_semestre}): {similar_semestre}')
 print(f'Usuario más diferente a mí este semestre ({mi_semestre}): {diferente_semestre}')
+
+#%% Comparación contra el grupo de Modelado Predictivo remoto
+# De ese grupo, sacamos quién es literalmente yo (distancia 0, es decir, respondió idéntico a mí) y
+# quién es mi opuesto (la mayor distancia posible).
+alias_grupo = ['Magui', 'Moi', 'Israel', 'evalerio1993@gmail.com', 'Fer Velasco']
+indices_grupo = np.array([encuesta_binaria.index.get_loc(alias) for alias in alias_grupo])
+ryan_gosling, mi_opuesto = usuario_similar_y_diferente(indices_grupo, distancias_mi_usuario, aliases_encuesta)
+
+print(f'\nDe entre {alias_grupo}:')
+print(f'El que es literalmente yo: {ryan_gosling}')
+print(f'El que es mi opuesto: {mi_opuesto}')
