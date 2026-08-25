@@ -13,6 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #%% IMPORT THE DATA SET
+# A partir de los datos, vamos a intentar predecir el índice de refracción
 data = pd.read_csv('glass.data',header=None)
 names = ['ID','Refractive_index','Na','Mg','Al','Si','K',
          'Ca','Ba','Fe','Glass_type']
@@ -454,4 +455,7 @@ summary = data.describe()
 import ydata_profiling
 #report = data.profile_report()
 report = ydata_profiling.ProfileReport(data)
-report.to_file(output_file="../Data/glass/Glass data profiling2.html")
+report.to_file(output_file="Glass data profiling2.html")
+
+
+# %%
