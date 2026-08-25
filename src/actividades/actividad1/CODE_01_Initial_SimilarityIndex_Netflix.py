@@ -254,5 +254,49 @@ distancias_correlacion = scipy_spatial_distance.squareform(distancias_correlacio
 
 # %%
 # -- Tarea 1: Dado el código anterior, implemente un código que recomiende una película a un usuario
+# Pongo esto en función porque hay que hacer esto 3 veces con diferentes métricas de distancia
+def recomendar_pelicula(data_seleccionada, fnames, usuario, k, matriz_distancias):
+    """
+    data_seleccionada: DataFrame con filas = usuarios, columnas = películas
+    fnames: arreglo con los nombres de los usuarios
+    usuario: índice del usuario objetivo
+    k: cantidad de usuarios vecinos a considerar
+    matriz_distancias: matriz de distancias entre usuarios (n x n)
+    """
 
+    # Primero sacamos las distancias del usuario objetivo con todos los demás. Las ordenamos, y
+    # también sacamos sus índices ordenados
+    distancias_usuario = matriz_distancias[usuario]
+    distancias_usuario_ordenadas = np.sort(distancias_usuario)
+    distancias_usuario_ordenadas_indices = np.argsort(distancias_usuario_ordenadas)
 
+    # Sacamos los 5 usuarios más similares y sus calificaciones
+    usuarios_similares_topK = fnames[distancias_usuario_ordenadas_indices[1:k+1]]
+    usuarios_similares_topK_peliscalis = data_seleccionada.loc[usuarios_similares_topK]
+
+    # De las películas que mi usuario ha visto, tumbo las que éste haya calificado con 4 o más.
+    # Luego tumbo esas películas de las películas con calificaciones de los top 5 más similares
+    usuario_peliculas_no_favoritas = data_seleccionada.iloc[usuario][data_seleccionada.iloc[usuario] <= 4]
+    usuarios_similares_topK_peliscalis = usuarios_similares_topK_peliscalis.loc[:, usuarios_similares_topK_peliscalis.columns.isin(usuario_peliculas_no_favoritas.index)]
+
+    # Agregamos las calificaciones de los usuarios más similares y ordenamos de menor a mayor
+    usuarios_similares_topK_peliscalis_promedio = np.mean(usuarios_similares_topK_peliscalis, axis=0)
+    usuarios_similares_topK_peliscalis_promedio_ordenadas = usuarios_similares_topK_peliscalis_promedio.sort_values()
+
+    # Tiramos la película con calificación más alta
+    return usuarios_similares_topK_peliscalis_promedio_ordenadas.index[-1]
+
+# Tomamos los k usuarios más similares, y sacamos el promedio de calificaciones. Tomamos a "NATS". 
+# Lo hacemos con 3 métricas diferentes
+recomendacion_coseno = recomendar_pelicula(data_seleccionada, fnames, 5, 5, distancias_cosenosimilitud)
+recomendacion_pitagoras = recomendar_pelicula(data_seleccionada, fnames, 5, 5, distancias_pitagoras)
+recomendacion_correlacion = recomendar_pelicula(data_seleccionada, fnames, 5, 5, distancias_correlacion)
+
+# Hecho esto, recomiendo la última película
+print(f"Recomendación para el usuario {fnames[5]} (coseno de similitud): {recomendacion_coseno}")
+print(f"Recomendación para el usuario {fnames[5]} (teorema de Pitágoras): {recomendacion_pitagoras}")
+print(f"Recomendación para el usuario {fnames[5]} (correlación Pearson): {recomendacion_correlacion}")
+
+# Conclusión: aunque nuestras métricas claramente dan resultados distintos, el resultado final es
+# el mismo por estar basado en la calificación promedio de los top 5 más similares. Tal vez 
+# necesitemos alguna modificación para añadir más variedad.
