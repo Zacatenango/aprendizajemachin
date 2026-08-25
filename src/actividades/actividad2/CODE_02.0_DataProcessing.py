@@ -66,10 +66,10 @@ plt.show()
 sns.pairplot(data,hue='Refractive_index')
 plt.show()
 # Option 3. Select variables to plot "all-vs-all"
-sns.pairplot(data,vars=['Refractive_index','Na','Mg'])
+sns.pairplot(data,vars=['Refractive_index','Na','Ba'])
 plt.show()
 # Option 4. Selection of variables of interest
-fig = sns.pairplot(data,x_vars=['Na','Mg'], y_vars=['Refractive_index'])
+fig = sns.pairplot(data,x_vars=['Na','Ba'], y_vars=['Refractive_index'])
 plt.show()
 
 #%% View one of the variables
@@ -206,8 +206,8 @@ plt.subplot(1,2,1)
 plt.hist(data.Refractive_index)
 plt.xlabel('Refractive_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg)
-plt.xlabel('Magnesium (Mg)'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Bario (Ba)'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 
@@ -267,40 +267,41 @@ data['Refractive_index_no_skewness'],lamb = stats.boxcox(data.Refractive_index)
 
 
 #%% Transformation to limit skewness
-data['Mg_index_no_skewness'] = np.sqrt(data.Mg)
+data['Ba_index_no_skewness'] = np.sqrt(data.Ba)
 
 
 fig = plt.figure()
 plt.subplot(1,2,1)
-plt.hist(data.Mg)
-plt.xlabel('Mg_index'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Ba_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg_index_no_skewness)
-plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
+plt.hist(data.Ba_index_no_skewness)
+plt.xlabel('Ba_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 
 #%
-data['Mg_index_no_skewness'] = np.log(data.Mg+1)
+data['Ba_index_no_skewness'] = np.log(data.Ba+1)
+#data['Ba_index_no_skewness'] = np.log(data.Ba)
 fig = plt.figure()
 plt.subplot(1,2,1)
-plt.hist(data.Mg)
-plt.xlabel('Mg_index'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Ba_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg_index_no_skewness)
-plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
+plt.hist(data.Ba_index_no_skewness)
+plt.xlabel('Ba_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 
 #%
-data['Mg_index_no_skewness'] = 1/(data.Mg)
+data['Ba_index_no_skewness'] = 1/(data.Ba)
 
 fig = plt.figure()
 plt.subplot(1,2,1)
-plt.hist(data.Mg)
-plt.xlabel('Mg_index'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Ba_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg_index_no_skewness)
+plt.hist(data.Ba_index_no_skewness)
 plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
@@ -308,19 +309,19 @@ plt.show()
 ### BoxCox transformation using scipy
 from scipy import stats
 # data['Mg_index_no_skewness'] = stats.boxcox(data.Mg+1,lmbda=2.23672519042031)
-data['Mg_index_no_skewness'] = stats.yeojohnson(data.Mg,lmbda=2.23672519042031)  # Box-Cox sólo funciona con números positivos, hay que usar el Box-Cox mejorado que es Yeo-Johnson
+data['Ba_index_no_skewness'] = stats.yeojohnson(data.Ba,lmbda=2.23672519042031)  # Box-Cox sólo funciona con números positivos, hay que usar el Box-Cox mejorado que es Yeo-Johnson
 fig = plt.figure()
 plt.subplot(1,2,1)
-plt.hist(data.Mg)
-plt.xlabel('Mg_index'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Ba_index'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg_index_no_skewness)
-plt.xlabel('Mg_index_no_skewness'),plt.ylabel('Frequency')
+plt.hist(data.Ba_index_no_skewness)
+plt.xlabel('Ba_index_no_skewness'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 #%
 # data['Mg_index_no_skewness'],lamb = stats.boxcox(data.Mg+1)
-data['Mg_index_no_skewness'],lamb = stats.yeojohnson(data.Mg)
+data['Ba_index_no_skewness'],lamb = stats.yeojohnson(data.Ba)
 
 #%%%%% ASYMMETRY IN THE VARIABLES
 fig = plt.figure()
@@ -358,8 +359,8 @@ plt.subplot(1,2,1)
 plt.hist(data.K)
 plt.xlabel('K'),plt.ylabel('Frequency')
 plt.subplot(1,2,2)
-plt.hist(data.Mg)
-plt.xlabel('Magnesium (Mg)'),plt.ylabel('Frequency')
+plt.hist(data.Ba)
+plt.xlabel('Bario (Ba)'),plt.ylabel('Frequency')
 fig.tight_layout()
 plt.show()
 
