@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 #%% IMPORT THE DATA SET
-data = pd.read_csv('../Data/glass/glass.data',header=None)
+data = pd.read_csv('glass.data',header=None)
 names = ['ID','Refractive_index','Na','Mg','Al','Si','K',
          'Ca','Ba','Fe','Glass_type']
 data.columns = names
