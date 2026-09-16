@@ -56,7 +56,7 @@ from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-RANDOM_STATE = 42
+RANDOM_STATE = 297974
 TARGET = 'price'
 
 #%% Load data
@@ -295,3 +295,35 @@ Results (random_state=42):
   Jaguar/Mercedes). The models are therefore valid for the "regular" range of
   cars; very expensive cars would be extrapolation.
 '''
+
+#%% Implementation of SVR
+from sklearn.svm import SVR
+from sklearn.compose import TransformedTargetRegressor
+
+SVregresion = TransformedTargetRegressor(regressor=Pipeline([("scaler", StandardScaler()), ("svr", SVR())]), transformer=StandardScaler())
+param_grid = \
+[
+    {
+        "regressor__svr__kernel": ["linear"],
+        'regressor__svr__C': [0.01, 0.1, 1, 10],
+        'regressor__svr__epsilon': [0.05, 0.1, 0.2]
+    },
+    {
+        'regressor__svr__kernel': ['rbf'],
+        'regressor__svr__C': [1, 10, 100],
+        'regressor__svr__gamma': ['scale', 0.01, 0.05, 0.1],
+        'regressor__svr__epsilon': [0.05, 0.1, 0.2]
+    }
+]
+
+svr_search = GridSearchCV(SVregresion, param_grid, cv=cv, scoring='neg_root_mean_squared_error')
+svr_search.fit(X_train, y_train)
+print('\nSVR best params (CV):', svr_search.best_params_)
+
+name_svr = 'SVR (%s)' % svr_search.best_params_['regressor__svr__kernel']
+y_predict = evaluate(name_svr, svr_search.best_estimator_)   # adds to `results`
+plot_real_vs_predict(name_svr, y_predict)
+
+results_df = pd.DataFrame(results).T
+print(results_df.round(4))
+print('SVR CV RMSE (train):', -svr_search.best_score_)
