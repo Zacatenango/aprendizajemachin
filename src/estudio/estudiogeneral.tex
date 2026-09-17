@@ -41,9 +41,33 @@
 
 \chapter {Conceptos previos}
 
-\section {Métricas MSE y R2}
+\section {Métricas MSE y $R^2$}
 
+El error cuadrático promedio es una de las métricas más básicas para medir la precisión de la predicción de un modelo de aprendizaje machín. Consiste en aplicar la fórmula:
 
+\[
+   MSE = \frac{1}{n}\sum_{i=1}^{n} [ y_i - \hat{y}_i  ]^2 
+\]
+
+donde $y_i$ es alguno de mis datos $y = \{ y_1, y_2, ..., y_n \}$ y $\hat{y}_i$ es alguno del conjunto $\hat{y}$ de datos predichos.
+
+Es decir, es la sumatoria de la diferencia entre todos mis datos y el dato predicho, elevado al cuadrado para que se haga positivo y así la sumatoria no dé 0 en caso de que haya una distribución normal en el error de los datos. Es la medida más directa, pero padece de hacerse muy grande en caso de que mis datos sean números muy grandes por estar todo elevado al cuadrado.
+
+Para remediar este problema, la segunda métrica básica consiste en una comparación divisiva del MSE de la predicción contra el MSE del modelo más sencillo de todos, que es el promedio. ¿Por qué el promedio? Porque, como lo vi en la clase de estadística multivariable, el promedio es la función básica que minimiza el error cuadrático acumulado (se obtiene de sacar la derivada del MSE con respecto a y e igualarla a 0). Entonces, si mi predicción reduce el MSE más de lo que el simple promedio es capaz, el $R^2$ va a ser más grande.
+
+Entonces, con la $y$ y $\hat{y}$ previamente definidas como mis datos de verdad y mis predicciones, defino ahora $\bar{y}$ como el promedio de mis datos y saco:
+
+\[
+   R^2 = 1 - \frac{\sum_{i=1}^{n}[y_i - \hat{y}_i]^2}{\sum_{i=1}^{n}[y_i - \bar{y}]^2}
+\]
+
+Este número tiene 3 escenarios:
+
+\begin{itemize}
+   \item La predicción fue perfecta, lo que causó que el MSE de mis datos de verdad contra los predichos sea 0, lo que hace que la división entera se haga 0, lo que hace que al 1 se le reste 0. \textbf{$R^2$ = 1 quiere decir una predicción perfecta.}
+   \item La predicción fue tan mala como simplemente sacar el promedio. Eso causa que el MSE de la predicción sea igual que el MSE del promedio, lo que hace que la división se haga 1, lo cual se le resta al otro 1. \textbf{$R^2$ = 0 quiere decir que la predicción supuestamente no fue mejor que el promedio.}
+   \item La predicción fue tan absurdamente mala que su MSE resultó ser mayor que el del promedio. Ese MSE es el numerador de la división. Entonces, el numerador será más grande que el denominador, y eso hace que la división dé algo mayor que 1, lo cual se resta al otro 1, haciendo el resultado negativo. \textbf{$R^2 <$ 0 quiere decir que la predicción fue peor que el promedio.}
+\end{itemize}
 
 
 % \bibliographystyle{apalike}
