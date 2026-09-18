@@ -3,3 +3,4 @@
 \contentsline {section}{\numberline {1.1}Métricas MSE y $R^2$}{2}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Fitting, entrenamiento-prueba y leakage}{3}{section.1.2}%
 \contentsline {subsection}{\numberline {1.2.1}Leakage}{4}{subsection.1.2.1}%
+\contentsline {section}{\numberline {1.3}Limpieza de datos}{5}{section.1.3}%

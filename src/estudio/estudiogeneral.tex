@@ -9,6 +9,8 @@
 \usepackage{textcomp}            % Tipografías compañeras
 \usepackage{lmodern}             % Tipografía Latin Modern
 \usepackage{moreverb}            % Para escribir código
+\usepackage{listings}            % Listados de código con formato
+\usepackage{xcolor}              % Colores para los listados
 \usepackage{tfrupee}
 \usepackage{fontawesome5}
 \usepackage{parskip}
@@ -29,6 +31,42 @@
 % Formato global:
 \setlength{\parindent}{0cm}      % Párrafos sin sangría inicial
 \hypersetup{pdfborder={0 0 0}}   % Ligas sin borde
+
+% Estilo de los listados de código:
+\definecolor{codigofondo}{rgb}{0.97,0.97,0.95}
+\definecolor{codigocomentario}{rgb}{0.40,0.50,0.40}
+\definecolor{codigopalabra}{rgb}{0.10,0.25,0.60}
+\definecolor{codigocadena}{rgb}{0.60,0.20,0.20}
+\definecolor{codigonumero}{rgb}{0.50,0.50,0.50}
+
+\lstdefinestyle{python}{
+   language=Python,
+   basicstyle=\ttfamily\small,
+   backgroundcolor=\color{codigofondo},
+   commentstyle=\color{codigocomentario}\itshape,
+   keywordstyle=\color{codigopalabra}\bfseries,
+   stringstyle=\color{codigocadena},
+   numbers=left,                 % Números de línea a la izquierda
+   numberstyle=\ttfamily\tiny\color{codigonumero},
+   numbersep=8pt,
+   stepnumber=1,
+   frame=single,
+   rulecolor=\color{codigonumero},
+   framexleftmargin=3pt,
+   xleftmargin=18pt,
+   breaklines=true,              % Parte automáticamente las líneas largas
+   breakatwhitespace=false,
+   postbreak=\mbox{\textcolor{codigonumero}{$\hookrightarrow$}\space},
+   showstringspaces=false,
+   tabsize=4,
+   columns=flexible,
+   upquote=true,
+   captionpos=b,
+   literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+            {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+            {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+\lstset{style=python}
 
 \begin {document}
 \title {Guía de estudio de la clase de Aprendizaje Machín}
@@ -104,15 +142,29 @@ Entonces, al dividir nuestros datos en entrenamiento y \textit{training}, podemo
 \end{itemize}
 
 
-
 \subsection{Leakage}
 
 El \textit{leakage} ocurre cuando, por alguna razón, hemos usado datos ajenos al conjunto de Entrenamiento para entrenar nuestro modelo. El resultado que eso trae es que el modelo ``hace trampa'', y trae como resultado que el $R^2$ en entrenamiento y testing parece estar fabulosamente alto, para que el modelo termine colapsando en Producción.
 
-Una forma común de leakage es \textit{contaminación cruzada entre Entrenamiento y Testing,} que es cuando Entrenamiento de alguna forma termina con datos representativos de Testing. Por ejemplo, si relleno los nulos de mis datos de Entrenamiento con la mediana de todo mi dataset, \textbf{estoy contaminando mis datos de Entrenamiento con datos de Testing,} porque la mediana de todo mi dataset describe también los datos de Testing, y con eso el modelo tiene a priori una idea de cómo son los datos de Testing y se ajusta a eso.
+Una forma común de leakage es \textit{contaminación cruzada entre Entrenamiento y Testing,} que es cuando Entrenamiento de alguna forma termina con datos representativos de Testing. Por ejemplo, si relleno los nulos de mis datos de Entrenamiento con la mediana de todo mi dataset, \textbf{estoy contaminando mis datos de Entrenamiento con datos de Testing,} porque la mediana de todo mi dataset describe también los datos de Testing, y con eso el modelo tiene a priori una idea de cómo son los datos de Testing y se ajusta a eso, ya que los modelos de machine learning son para ajustarse; pero en el proceso, aprende a ajustarse únicamente a los datos que tengo, y se desconoce cuánto se ajustará a los datos que reciba ya en Producción.
 
 Entonces, \textbf{el modelo no debe saber absolutamente nada de qué hay en Testing.} Se debe entrenar como si los datos de Testing no existieran todavía, como si Entrenamiento fueran todos sus datos y Testing fuera su puesta en servicio. En consecuencia, todas las transformaciones de datos (imputación, escalamiento, eliminación de outliers, feature engineering...) deben hacerse únicamente sobre Entrenamiento. \textit{Corolario importante:} en línea con que los datos de Testing simulan la puesta en Producción del modelo, \textit{no se deben tumbar los outliers de Testing si los tumbé en Entrenamiento;} pues Testing es una simulación de la realidad, y la realidad me va a tirar outliers.
 
+
+
+
+\section {Limpieza de datos}
+
+Trabajando sobre la práctica 2, comenzamos leyendo nuestro archivo y caracterizándolo un poco:
+
+\begin{lstlisting}[language=Python]
+import pandas
+
+df = pandas.read_csv("HW2_training_100.csv")
+print(df.columns.tolist())
+print(df.dtypes)
+print(df.head(3))
+\end{lstlisting}
 
 
 
