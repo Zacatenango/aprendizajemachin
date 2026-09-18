@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1789681055.23625 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" "estudiogeneral.pdf" "estudiogeneral" 1789681055.90114 0
+["pdflatex"] 1789698167.81549 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" "estudiogeneral.pdf" "estudiogeneral" 1789698168.35733 0
   "/etc/texmf/web2c/texmf.cnf" 1764119026.4066 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" 1789681055.00358 4105 a81a6b4777528873faf8f525a7093558 ""
+  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" 1789698167.64606 9491 664536b7f8ee2aa5cb0e121ee3cd4e10 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1000.tfm" 1136768653 3584 adb004a0c8e7c46ee66cad73671f37b4 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/latex-fonts/lasy6.tfm" 1136768653 520 4889cce2180234b97cad636b6039c722 ""
@@ -154,6 +154,7 @@
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmr10.tfm" 1254269338 12056 7e13df7fe4cbce21b072ba7c4f4deb6e ""
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmr12.tfm" 1254269338 12092 7b1546e2d096cfd5dcbd4049b0b1ec2e ""
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmr17.tfm" 1254269338 12156 ca1ae6a3c8564e89597f1f993fba1608 ""
+  "/usr/share/texmf/fonts/tfm/public/lm/ec-lmri10.tfm" 1254269338 17148 9556e1b5f936b77a796f68d2d559ba99 ""
   "/usr/share/texmf/fonts/tfm/public/lm/ec-lmro10.tfm" 1254269338 12196 3ef208c5996a6e35328a273ab73fa1e1 ""
   "/usr/share/texmf/fonts/tfm/public/lm/lmex10.tfm" 1148093231 992 ce925c9346c7613270a79afbee98c070 ""
   "/usr/share/texmf/fonts/tfm/public/lm/lmmi10.tfm" 1148093231 1528 6d36b2385e0ca062a654de6ac59cb34f ""
@@ -183,6 +184,7 @@
   "/usr/share/texmf/fonts/type1/public/lm/lmr12.pfb" 1255129361 113634 f99c44d58bae0863375faf0e1d74d612 ""
   "/usr/share/texmf/fonts/type1/public/lm/lmr17.pfb" 1255129361 119752 1bd8d06e4079df624bf59ce3ad7c9aa6 ""
   "/usr/share/texmf/fonts/type1/public/lm/lmr7.pfb" 1255129361 121145 68312a933e2c689ed40ec0aba373e279 ""
+  "/usr/share/texmf/fonts/type1/public/lm/lmri10.pfb" 1255129361 112593 fda2373ba4420af33949610de4c28fe8 ""
   "/usr/share/texmf/fonts/type1/public/lm/lmro10.pfb" 1255129361 131205 e6b9f0f008cce138627a5f401db34a3b ""
   "/usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb" 1254269338 27863 09ce3735688ffde955e72da27c95b61a ""
   "/usr/share/texmf/tex/latex/lm/lmodern.sty" 1616454256 1608 b00724785a9e9c599e5181bb8729160b ""
@@ -194,10 +196,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1741904018 41538 c016915c1d51223b6dbbfe27341748a8 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1789675510 5343802 4d13b086ed2f4a8fd96f4618b0724773 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1789675916 1980043 269f28f3532df3d0c9544e1a17991a9c ""
-  "estudiogeneral.aux" 1789681055.83958 1041 ff956e80dfa32f6278b3ce2f0a283b67 "pdflatex"
-  "estudiogeneral.out" 1789681055.83958 282 17ae8bcae6353aee979e6cf04da51594 "pdflatex"
-  "estudiogeneral.tex" 1789681055.00358 4105 a81a6b4777528873faf8f525a7093558 ""
-  "estudiogeneral.toc" 1789681055.83958 184 b9a70351469b8ecd276f3a431dc8038b "pdflatex"
+  "estudiogeneral.aux" 1789698168.30606 1287 ad108d47495efd88f431da7d54fa05e8 "pdflatex"
+  "estudiogeneral.out" 1789698168.30606 636 0a169aa35c0bb466e719153fc55aa0a8 "pdflatex"
+  "estudiogeneral.tex" 1789698167.64606 9491 664536b7f8ee2aa5cb0e121ee3cd4e10 ""
+  "estudiogeneral.toc" 1789698168.30606 360 a729f98dfb171b19ee1206d242798d19 "pdflatex"
   (generated)
   "estudiogeneral.aux"
   "estudiogeneral.log"

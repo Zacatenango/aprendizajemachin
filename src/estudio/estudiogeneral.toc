@@ -1,3 +1,5 @@
 \babel@toc {spanish}{}\relax 
 \contentsline {chapter}{\numberline {1}Conceptos previos}{2}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Métricas MSE y $R^2$}{2}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Fitting, entrenamiento-prueba y leakage}{3}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Leakage}{4}{subsection.1.2.1}%

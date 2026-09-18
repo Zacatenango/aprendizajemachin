@@ -39,7 +39,14 @@
 \tableofcontents
 
 
+
+
+
+
 \chapter {Conceptos previos}
+
+
+
 
 \section {Métricas MSE y $R^2$}
 
@@ -66,8 +73,47 @@ Este número tiene 3 escenarios:
 \begin{itemize}
    \item La predicción fue perfecta, lo que causó que el MSE de mis datos de verdad contra los predichos sea 0, lo que hace que la división entera se haga 0, lo que hace que al 1 se le reste 0. \textbf{$R^2$ = 1 quiere decir una predicción perfecta.}
    \item La predicción fue tan mala como simplemente sacar el promedio. Eso causa que el MSE de la predicción sea igual que el MSE del promedio, lo que hace que la división se haga 1, lo cual se le resta al otro 1. \textbf{$R^2$ = 0 quiere decir que la predicción supuestamente no fue mejor que el promedio.}
-   \item La predicción fue tan absurdamente mala que su MSE resultó ser mayor que el del promedio. Ese MSE es el numerador de la división. Entonces, el numerador será más grande que el denominador, y eso hace que la división dé algo mayor que 1, lo cual se resta al otro 1, haciendo el resultado negativo. \textbf{$R^2 <$ 0 quiere decir que la predicción fue peor que el promedio.}
+   \item La predicción fue tan absurdamente mala que su MSE resultó ser mayor que el del promedio. El MSE de la predicción es el numerador de la división. Entonces, el numerador será más grande que el denominador, y eso hace que la división dé algo mayor que 1, lo cual se resta al otro 1, haciendo el resultado negativo. \textbf{$R^2 <$ 0 quiere decir que la predicción fue peor que el promedio.}
 \end{itemize}
+
+Normalmente queremos que nuestro $R^2$ esté tan cerca de 1 como sea posible, pues en términos numéricos, $R^2 = 1$ quiere decir que nuestro modelo predijo todo. Sin embargo, como también ya sabemos y como se supo varias décadas después de la Comisión Stiglitz-Sen-Fitoussi, reducir algo tan complejo como la exactitud de nuestra predicción a una sola métrica es perdernos de muchos detalles.
+
+
+
+
+\section {Fitting, entrenamiento-prueba y leakage}
+
+El proceso de \textbf{fitting} (ajuste) o \textbf{entrenamiento} es el proceso de ajustar los parámetros internos de nuestro modelo de aprendizaje machín para que éste capture los patrones de nuestro conjunto de datos.
+
+Los pasos básicos del proceso de fitting son:
+
+\begin{enumerate}
+   \item \textbf{Definir una función objetivo:} Con frecuencia también conocida en la literatura como \textit{función de costo} o \textit{función de pérdida}, es una función que mide la discrepancia entre las salidas predichas y los datos verdaderos. El MSE es la función más sencilla y común de pérdida.
+   \item \textbf{Optimizar:} Con alguno de los miles de algoritmos que miles de científicos de datos han desarrollado para resolver todo tipo de problemas de esta ciencia multibillonaria, calculamos los parámetros internos óptimos que minimizan la función de pérdida. El proceso con frecuencia es iterativo, pero no necesariamente: si nuestro modelo es regresión lineal, ésta tiene solución analítica.
+   \item \textbf{Evaluar:} Se prueba el modelo ajustado contra los \textbf{datos de validación}, con el fin de garantizar que éste generalice bien en vez de tan sólo memorizar ejemplos de entrenamiento.
+\end{enumerate}
+
+De ahí se desprende que \textbf{los datos deben dividirse en conjunto de entrenamiento y conjunto de validación}. Esto se debe a que saber a priori el $R^2$ de un modelo ya ajustado no es suficiente para determinar si éste es capaz de generalizar; esto, ya que existe el escenario del \textbf{overfitting} (sobreajuste), que puede describirse como que el modelo se alineó demasiado fuertemente a nuestros datos, y sus parámetros internos terminaron reproduciendo más el ruido y las anomalías de nuestros datos que los datos en sí; es equivalente en machine learning a machetear un libro para un examen en vez de entender los conceptos, causando como resultado ser incapaz de contestar la pregunta si ésta se expresa de forma diferente.
+
+Entonces, al dividir nuestros datos en entrenamiento y \textit{training}, podemos identificar el \textit{overfitting} y \textit{underfitting} a priori, sin tener que esperar a nuestros datos reales; y esto lo hacemos a través del $R^2$ de nuestro modelo contra los datos de entrenamiento y contra los datos de prueba.
+
+\begin{itemize}
+   \item \textbf{$R^2$ alto en Entrenamiento y Testing:} Este es el escenario ideal, y quiere decir que el modelo aprendió los patrones de Entrenamiento (alto $R^2$ ahí) y fue capaz de replicarlos en Testing (alto $R^2$ ahí). Un $R^2$ saludable a ojo de buen cubero es entre 0.8 y 0.9.
+   \item \textbf{$R^2$ alto en Entrenamiento, bajo en Testing:} Overfitting; el modelo se ajustó por completo a los datos de Entrenamiento, pero no fue capaz de ajustarse a Testing. Hay muchas diversas causas: modelos que tienden a hacer overfitting, tienen demasiadas capas o parámetros, el dataset tiene ruido o outliers, o le hicimos demasiado entrenamiento...
+   \item \textbf{$R^2$ bajo en Entrenamiento y Testing:} Underfitting: el modelo no puede ajustarse. Tal vez el modelo sea demasiado simple (la regresión lineal difícilmente ajusta en variables cuya relación no es lineal), tal vez nos haga falta más entrenamiento, tal vez haya outliers y ruido...
+\end{itemize}
+
+
+
+\subsection{Leakage}
+
+El \textit{leakage} ocurre cuando, por alguna razón, hemos usado datos ajenos al conjunto de Entrenamiento para entrenar nuestro modelo. El resultado que eso trae es que el modelo ``hace trampa'', y trae como resultado que el $R^2$ en entrenamiento y testing parece estar fabulosamente alto, para que el modelo termine colapsando en Producción.
+
+Una forma común de leakage es \textit{contaminación cruzada entre Entrenamiento y Testing,} que es cuando Entrenamiento de alguna forma termina con datos representativos de Testing. Por ejemplo, si relleno los nulos de mis datos de Entrenamiento con la mediana de todo mi dataset, \textbf{estoy contaminando mis datos de Entrenamiento con datos de Testing,} porque la mediana de todo mi dataset describe también los datos de Testing, y con eso el modelo tiene a priori una idea de cómo son los datos de Testing y se ajusta a eso.
+
+Entonces, \textbf{el modelo no debe saber absolutamente nada de qué hay en Testing.} Se debe entrenar como si los datos de Testing no existieran todavía, como si Entrenamiento fueran todos sus datos y Testing fuera su puesta en servicio. En consecuencia, todas las transformaciones de datos (imputación, escalamiento, eliminación de outliers, feature engineering...) deben hacerse únicamente sobre Entrenamiento. \textit{Corolario importante:} en línea con que los datos de Testing simulan la puesta en Producción del modelo, \textit{no se deben tumbar los outliers de Testing si los tumbé en Entrenamiento;} pues Testing es una simulación de la realidad, y la realidad me va a tirar outliers.
+
+
 
 
 % \bibliographystyle{apalike}
