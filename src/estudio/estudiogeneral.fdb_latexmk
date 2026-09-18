@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1789704778.42779 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" "estudiogeneral.pdf" "estudiogeneral" 1789704779.11469 0
+["pdflatex"] 1789711499.0458 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" "estudiogeneral.pdf" "estudiogeneral" 1789711499.71094 0
   "/etc/texmf/web2c/texmf.cnf" 1764119026.4066 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" 1789704778.2342 16049 539af50a8181e5504d2c085ee50e3707 ""
+  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/estudio/estudiogeneral.tex" 1789711498.86633 18153 6c985516d997d9afff6ab1bb10d3b089 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1000.tfm" 1136768653 3584 adb004a0c8e7c46ee66cad73671f37b4 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/latex-fonts/lasy6.tfm" 1136768653 520 4889cce2180234b97cad636b6039c722 ""
@@ -220,10 +220,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1741904018 41538 c016915c1d51223b6dbbfe27341748a8 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1789675510 5343802 4d13b086ed2f4a8fd96f4618b0724773 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1789675916 1980043 269f28f3532df3d0c9544e1a17991a9c ""
-  "estudiogeneral.aux" 1789704779.0422 1413 1119821e23d47876413c80b6a18a703b "pdflatex"
-  "estudiogeneral.out" 1789704779.0422 781 6fe6f6ee03d559d6a5f138c0ad0ceaf4 "pdflatex"
-  "estudiogeneral.tex" 1789704778.2342 16049 539af50a8181e5504d2c085ee50e3707 ""
-  "estudiogeneral.toc" 1789704779.0422 437 0db59e180ad279fec5d54f093059a7e3 "pdflatex"
+  "estudiogeneral.aux" 1789711499.64633 1753 ef89b75d6abaa4bace2c4759c41bc7b3 "pdflatex"
+  "estudiogeneral.out" 1789711499.64633 1333 55db67c8cce40ceca7f59d8dd0e753e9 "pdflatex"
+  "estudiogeneral.tex" 1789711498.86633 18153 6c985516d997d9afff6ab1bb10d3b089 ""
+  "estudiogeneral.toc" 1789711499.64633 649 bed3176cf765733dba79cce28f9fa2eb "pdflatex"
   (generated)
   "estudiogeneral.aux"
   "estudiogeneral.log"

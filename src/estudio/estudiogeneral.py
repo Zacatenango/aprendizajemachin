@@ -1,4 +1,5 @@
 import pandas
+from sklearn.model_selection import train_test_split
 
 # Paso 1: MSE y R cuadrada
 y = [3,5,7,9]
@@ -57,3 +58,14 @@ print()
 print(df.isna().sum())
 print()
 print(df.shape)
+
+###############
+# División entrenamiento-prueba
+X = df.drop("Y", axis=1)  # Para saber cuál eje es cual, doy df.shape, y la tupla resultante es (<cantidad en el eje 0>, <cantidad en el eje 1>, ...)
+Y = df["Y"]
+# 20% Test, 80% Entrenamiento
+X_entreno, X_prueba, Y_entreno, Y_prueba = train_test_split(X, Y, test_size=0.2, random_state=42)
+print(X_entreno.shape, X_prueba.shape)
+
+print(len(X_entreno))
+print(len(X_entreno.dropna()))

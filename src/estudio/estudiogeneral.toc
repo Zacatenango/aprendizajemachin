@@ -4,3 +4,5 @@
 \contentsline {section}{\numberline {1.2}Fitting, entrenamiento-prueba y leakage}{3}{section.1.2}%
 \contentsline {subsection}{\numberline {1.2.1}Leakage}{4}{subsection.1.2.1}%
 \contentsline {section}{\numberline {1.3}Limpieza de datos}{5}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Entrenamiento y Prueba}{8}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Caso especial: datos pre-divididos en Entrenamiento y Prueba}{9}{subsection.1.4.1}%

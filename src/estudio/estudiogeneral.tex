@@ -316,6 +316,45 @@ dtype: int64
 
 Y con esto nuestros datos ya están limpios: ya todas las columnas son de tipo float64, la cantidad de NaNs es la misma, la figura de nuestro dataframe es la misma, los datos están bien limpiados.
 
+
+
+
+\section{Entrenamiento y Prueba}
+
+Una vez limpiados los datos, sigue hacer la división entre Entrenamiento y Prueba. (La semilla 42 es mandato del enunciado de la práctica).
+
+\begin{lstlisting}[language=Python]
+from sklearn.model_selection import train_test_split
+   X = df.drop("Y", axis=1)
+Y = df["Y"]
+# 20% Test, 80% Entrenamiento
+X_entreno, X_prueba, Y_entreno, Y_prueba = train_test_split(X, Y, test_size=0.2, random_state=42)
+print(X_entreno.shape, X_prueba.shape)
+\end{lstlisting}
+
+A continuación me topo con pared: en el código propuesto de la práctica 2 se sugiere usar regresión lineal; sin embargo, sabemos muy bien que la regresión lineal requiere datos llenos en toda la tabla. Esto quiere decir que no podemos usar una línea base de preprocesamiento. Debido a que tenemos que evitar hacer procesamiento de más, vamos a probar cuántos datos caen si le doy dropna(), la bien conocida función de PANDAS que tumba filas con valores faltantes. En línea con el principio de no contaminar Entrenamiento con información sobre Prueba, esta vez esto lo tengo que hacer únicamente sobre Entrenamiento. Pero antes, tengo que revisar cuántas filas me tumbará el dropna():
+
+\begin{lstlisting}[language=Python]
+len(X_entreno)
+len(X_entreno.dropna())
+\end{lstlisting}
+
+Si pruebo eso con el conjunto de datos abreviado a 100 renglones, me quedarán apenas 21 datitos sobre los cuales hacer regresión lineal. Así que hay que usar el conjunto completo de 800 renglones y feria. El resultado que me da usar el juego completo es que 646 renglones de Entrenamiento se reducen a 279, todavía pocos pero suficientes estrictamente hablando.
+
+Así que, sin más ni menos, tumbo los NaN.
+
+\begin{lstlisting}[language=Python]
+X_entreno = X_entreno.dropna()
+\end{lstlisting}
+
+
+\subsection{Caso especial: datos pre-divididos en Entrenamiento y Prueba}
+
+Al analizar el juego de datos, descubrí algo curioso: \textbf{en el archivo CSV, aproximadamente el 20\% de los datos tienen la Y en blanco.} Pareciera que el prof puso eso adrede para hacer ahí la división entre Entrenamiento y Testing.
+
+
+
+
 % \bibliographystyle{apalike}
 % \bibliographystyle{inlinebib}
 % \bibliography{estudiogeneral}
