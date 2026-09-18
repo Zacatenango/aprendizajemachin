@@ -1,3 +1,5 @@
+import pandas
+
 # Paso 1: MSE y R cuadrada
 y = [3,5,7,9]
 y_gorrito = [9,7,5,3]
@@ -9,3 +11,49 @@ promedio = sum(y)/len(y)
 MSE_promedio = sum((una_y - promedio)**2 for una_y in y)/len(y)
 R_cuadrada = 1 - (MSE/MSE_promedio)
 print(R_cuadrada)
+
+#########
+df = pandas.read_csv("HW2_training.csv")
+print(df.columns.tolist())
+print()
+print(df.dtypes)
+print()
+print(df.head(3))
+print()
+print(df.isna().sum())
+
+df.columns = df.columns.str.strip()  # Quitamos espacios en columnas
+df = df.drop(columns=["Unnamed: 10"])  # Tumbamos columna vacía
+
+def convertir_str_a_float(_param_str_numero):
+   # Bakayoke: ¿no es un string? de ser así, aborto
+   if type(_param_str_numero) is not str: return _param_str_numero
+   # Caso 1: espacio en blanco alrededor
+   _param_str_numero = _param_str_numero.strip()
+   # Caso 2: quitar comas
+   _param_str_numero = _param_str_numero.replace(",", "")
+   # Caso 3: ¿hay paréntesis? cambio por un -
+   if ( _param_str_numero.find('(') != -1 ):
+      _param_str_numero = _param_str_numero.replace('(', '-')
+      _param_str_numero = _param_str_numero.replace(')', '')
+   # Convierto a float; si todavía no puedo después de este proceso
+   # de conversión, me rindo y tiro None
+   try:
+      resultao = float(_param_str_numero)
+   except ValueError:
+      resultao = None
+   return resultao
+
+print(convertir_str_a_float('609,366.9835'))
+print(convertir_str_a_float('(158,355.4276)'))
+print(convertir_str_a_float('0.3745401190'))
+print(convertir_str_a_float(''))
+
+df = df.map(convertir_str_a_float)
+
+print("------- Revisión ---------")
+print(df.dtypes)
+print()
+print(df.isna().sum())
+print()
+print(df.shape)

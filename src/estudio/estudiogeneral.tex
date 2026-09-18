@@ -160,13 +160,161 @@ Trabajando sobre la práctica 2, comenzamos leyendo nuestro archivo y caracteriz
 \begin{lstlisting}[language=Python]
 import pandas
 
-df = pandas.read_csv("HW2_training_100.csv")
+df = pandas.read_csv("HW2_training.csv")
 print(df.columns.tolist())
+print()
 print(df.dtypes)
+print()
 print(df.head(3))
+print()
+print(df.isna().sum())
 \end{lstlisting}
 
+El resultado es:
 
+\begin{lstlisting}
+20.0
+-3.0
+[' X0 ', ' X1 ', ' X2 ', ' X3 ', ' X4 ', ' X5 ', ' X6 ', ' X7 ', ' X8 ', ' Y ', 'Unnamed: 10']
+
+ X0             object
+ X1             object
+ X2             object
+ X3             object
+ X4             object
+ X5             object
+ X6             object
+ X7             object
+ X8             object
+ Y              object
+Unnamed: 10    float64
+dtype: object
+
+                 X0                 X1                 X2   \
+0   0.3745401190000    0.9507143060000    0.7319939420000    
+1   0.5986584840000    0.1560186400000    0.1559945200000    
+2   0.7080725780000    0.0205844940000    0.9699098520000    
+
+                       X3                       X4   X5                 X6   \
+0   672,702.9942000000000    796,681.3972000000000   NaN   0.0000005310000    
+1   624,874.0996000000000    571,745.9831000000000   NaN   0.0000018100000    
+2    51,835.7991200000000    548,858.6651000000000   NaN   0.0000002230000    
+
+                 X7                 X8                        Y   Unnamed: 10  
+0   0.0000001720000    5.0000000000000    609,366.9835000000000           NaN  
+1   0.0000006130000    5.0000000000000    379,419.9478000000000           NaN  
+2   0.0000000729000    5.0000000000000     40,589.5357900000000           NaN  
+
+ X0              5
+ X1              5
+ X2             11
+ X3              3
+ X4              2
+ X5            458
+ X6              5
+ X7              3
+ X8              2
+ Y             159
+Unnamed: 10    808
+\end{lstlisting}
+
+De entrada podemos apreciar diversas cosas que dificultan trabajar con los datos de nuestro archivo: los nombres de las columnas están rodeados de espacios, hay una columna llamada \textit{Unnamed: 10} que no parece tener nada, y vemos que muchas columnas están en formato numérico de Excel: entre los primeros datos de X3 podemos ver el número `` 483,039.6976000000000 '' rodeado de espacios y en notación de millares, y luego el número ``(53.8607753100000)'', donde los paréntesis son notación de contabilidad americana para números negativos (no forma parte de las GAAP, pero sí lo requieren algunas organizaciones como la SEC).
+
+Entonces, tenemos que limpiar nuestros números:
+
+\begin{lstlisting}[language=Python]
+df.columns = df.columns.str.strip()  # Quitamos espacios en columnas
+df = df.drop(columns=["Unnamed: 10"])  # Tumbamos columna vacía
+\end{lstlisting}
+
+Para convertir nuestros números de string a número, necesitamos una función que convierta un string a un float:
+
+\begin{lstlisting}[language=Python]
+def convertir_str_a_float(_param_str_numero):
+   # Bakayoke: ¿no es un string? de ser así, aborto
+   if type(_param_str_numero) is not str: return _param_str_numero
+   # Caso 1: espacio en blanco alrededor
+   _param_str_numero = _param_str_numero.strip()
+   # Caso 2: quitar comas
+   _param_str_numero = _param_str_numero.replace(",", "")
+   # Caso 3: ¿hay paréntesis? cambio por un -
+   if ( _param_str_numero.find('(') != -1 ):
+      _param_str_numero = _param_str_numero.replace('(', '-')
+      _param_str_numero = _param_str_numero.replace(')', '')
+   # Convierto a float; si todavía no puedo después de este proceso
+   # de conversión, me rindo y tiro None
+   try:
+      resultao = float(_param_str_numero)
+   except ValueError:
+      resultao = None
+   return resultao
+\end{lstlisting}
+
+Probamos la función con 4 valores.
+
+\begin{lstlisting}[language=Python]
+print(convertir_str_a_float('609,366.9835'))
+print(convertir_str_a_float('(158,355.4276)'))
+print(convertir_str_a_float('0.3745401190'))
+print(convertir_str_a_float(''))
+\end{lstlisting}
+
+Los resultados son:
+
+\begin{lstlisting}
+609366.9835
+-158355.4276
+0.374540119
+None
+\end{lstlisting}
+
+Y luego aplicamos esa función a cada elemento de nuestro Dataframe.
+
+\begin{lstlisting}[language=Python]
+df = df.map(convertir_str_a_float)
+\end{lstlisting}
+
+Revisamos cómo quedó nuestro DF:
+
+\begin{lstlisting}[language=Python]
+print(df.dtypes)
+print()
+print(df.isna().sum())
+print()
+print(df.shape)
+\end{lstlisting}
+
+El resultado es:
+
+\begin{lstlisting}
+X0    float64
+X1    float64
+X2    float64
+X3    float64
+X4    float64
+X5    float64
+X6    float64
+X7    float64
+X8    float64
+Y     float64
+dtype: object
+
+X0      5
+X1      5
+X2     11
+X3      3
+X4      2
+X5    458
+X6      5
+X7      3
+X8      2
+Y     159
+dtype: int64
+
+(808, 10)
+\end{lstlisting}
+
+Y con esto nuestros datos ya están limpios: ya todas las columnas son de tipo float64, la cantidad de NaNs es la misma, la figura de nuestro dataframe es la misma, los datos están bien limpiados.
 
 % \bibliographystyle{apalike}
 % \bibliographystyle{inlinebib}
