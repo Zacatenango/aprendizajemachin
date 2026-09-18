@@ -348,9 +348,22 @@ X_entreno = X_entreno.dropna()
 \end{lstlisting}
 
 
-\subsection{Caso especial: datos pre-divididos en Entrenamiento y Prueba}
+\subsection{Hallazgos}
 
-Al analizar el juego de datos, descubrí algo curioso: \textbf{en el archivo CSV, aproximadamente el 20\% de los datos tienen la Y en blanco.} Pareciera que el prof puso eso adrede para hacer ahí la división entre Entrenamiento y Testing.
+\begin{enumerate}
+   \item Las columnas tenían espacios en sus nombres, y varios números en formato contable americano (millares separados por comas y números negativos en paréntesis). Con la función mencionada previamente, se convirtieron a float.
+   \item Una columna llamada \textit{Unnamed: 10} estaba totalmente vacía, se tumbó.
+   \item Hay 159 renglones contiguos al final con la Y vacía. Se tumbaron antes de hacer la división.
+   \item X5 falta en 70\% del bloque que sí tiene Y pero está presente en 98\% del bloque que no tiene Y. Sin embargo, como el promedio, la mediana y la desviación estándar de Y son muy similares tanto en las filas que sí tienen X5 como en las que no tienen X5, no se puede decir que hay una correlación entre no haber X5 y el valor de Y; por lo tanto, debería ser seguro imputar X5 (imputar una variable cuyos huecos no están relacionados con otra variable o con su propio valor generalmente es seguro porque no sesga los resultados).
+\end{enumerate}
+
+
+
+\section{Calidad de datos}
+
+
+
+
 
 
 

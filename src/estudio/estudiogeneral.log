@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.9.17)  18 SEP 2026 00:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.9.17)  18 SEP 2026 15:47
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -785,8 +785,8 @@ LaTeX Info: Redefining \. on input line 336.
 LaTeX Info: Redefining \% on input line 336.
 [8]
 
-LaTeX Info: Redefining \. on input line 361.
-LaTeX Info: Redefining \% on input line 361.
+LaTeX Info: Redefining \. on input line 374.
+LaTeX Info: Redefining \% on input line 374.
 [9] 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
 (./estudiogeneral.aux
@@ -798,21 +798,21 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `estudiogeneral.out' has not changed.
-(rerunfilecheck)             Checksum: 55DB67C8CCE40CECA7F59D8DD0E753E9;1333.
+(rerunfilecheck)             Checksum: AAD8D8EBC089101A14F03702AC782D70;1197.
  ) 
 Here is how much of TeX's memory you used:
- 29445 strings out of 475043
- 601570 string characters out of 5763019
- 1380387 words of memory out of 5000000
- 51838 multiletter control sequences out of 15000+600000
+ 29451 strings out of 475043
+ 601618 string characters out of 5763019
+ 1380390 words of memory out of 5000000
+ 51839 multiletter control sequences out of 15000+600000
  633938 words of font info for 83 fonts, out of 8000000 for 9000
  85 hyphenation exceptions out of 8191
  92i,6n,94p,867b,2578s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi7.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr7.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmro10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtti10.pfb>
-Output written on estudiogeneral.pdf (10 pages, 363281 bytes).
+Output written on estudiogeneral.pdf (10 pages, 363707 bytes).
 PDF statistics:
- 368 PDF objects out of 1000 (max. 8388607)
- 312 compressed objects within 4 object streams
- 154 named destinations out of 1000 (max. 500000)
- 69 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 377 PDF objects out of 1000 (max. 8388607)
+ 321 compressed objects within 4 object streams
+ 159 named destinations out of 1000 (max. 500000)
+ 77 words of extra memory for PDF output out of 10000 (max. 10000000)
 
