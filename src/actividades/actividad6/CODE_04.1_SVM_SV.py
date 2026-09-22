@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model,svm
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import (accuracy_score,
                              precision_score,
                              recall_score)
@@ -81,7 +82,7 @@ plt.show()
 
 
 #%% Import data (EXAMPLE 2)
-data = pd.read_csv('../Data/ex2data2.txt',header=None)
+data = pd.read_csv('ex2data2.txt',header=None)
 X = data.iloc[:,0:2]
 Y = data.iloc[:,2]
 
@@ -97,26 +98,66 @@ plt.legend()
 plt.show()
 
 
-#%% Creating the SV model
+#%% Split into train and test sets
+# The test set is kept out of the grid search to get an unbiased estimate
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size=0.2,
+                                                 stratify=Y,random_state=0)
+
+#%% Grid search over the SV model hyperparameters
 #C
 #Regularization parameter. The strength of the regularization is inversely proportional to C.
 # Must be strictly positive. The penalty is a squared l2 penalty. The squared L2 norm
 #the regularization term make the SVM less susceptible to outliers to improve generalization.
-
-#modelo = svm.SVC(kernel='linear',C=1, probability=True)
-#modelo = svm.SVC(kernel='poly',degree=3,C=1,  probability=True)
-modelo = svm.SVC(kernel='rbf',C=1,gamma='auto', probability=True)
+#gamma
 #if gamma='scale' (default) is passed then it uses 1 / (n_features * X.var()) as value of gamma,
-#if ‘auto’, uses 1 / n_features.
+#if 'auto', uses 1 / n_features.
 
-# It is posible to obtain a probability metric
-#modelo = svm.SVC(kernel='rbf',C=1,gamma='auto',probability=True)
+# One grid per kernel, so each kernel only gets the parameters it uses
+param_grid = [
+    {'kernel': ['linear'], 'C': [0.01, 0.1, 1, 10, 100]},
+    {'kernel': ['poly'], 'C': [0.01, 0.1, 1, 10, 100], 'degree': [2, 3, 4],
+     'gamma': ['scale', 'auto']},
+    {'kernel': ['rbf'], 'C': [0.01, 0.1, 1, 10, 100],
+     'gamma': ['scale', 'auto', 0.1, 1, 10]},
+]
 
-modelo.fit(X,Y)
+# It is posible to obtain a probability metric with probability=True
+grid_search = GridSearchCV(estimator=svm.SVC(probability=True,random_state=0),
+                           param_grid=param_grid,
+                           scoring='accuracy', cv=5,
+                           refit=True, return_train_score=True, n_jobs=-1)
+grid_search.fit(X_train,Y_train)
 
-Yhat = modelo.predict(X)
+print('Best parameters:',grid_search.best_params_)
+print('Best CV accuracy: %0.3f'%grid_search.best_score_)
 
-eval_perform(Y,Yhat)
+#%% Grid search results (top 10 combinations)
+results = pd.DataFrame(grid_search.cv_results_)
+cols = ['param_kernel','param_C','param_gamma','param_degree',
+        'mean_train_score','mean_test_score','std_test_score','rank_test_score']
+print(results[cols].sort_values('rank_test_score').head(10).to_string(index=False))
+
+#%% View the CV accuracy for the rbf kernel (C vs gamma)
+rbf = results[results['param_kernel']=='rbf']
+heat = rbf.pivot_table(index='param_gamma',columns='param_C',
+                       values='mean_test_score',aggfunc='first')
+fig = plt.figure(figsize=(8,6))
+plt.imshow(heat.values,cmap='viridis',aspect='auto')
+plt.colorbar(label='Mean CV accuracy')
+plt.xticks(range(heat.shape[1]),heat.columns)
+plt.yticks(range(heat.shape[0]),heat.index)
+plt.xlabel('C')
+plt.ylabel('gamma')
+plt.title('Grid search: rbf kernel')
+plt.show()
+
+#%% Evaluate the best model
+modelo = grid_search.best_estimator_
+
+print('\nTrain set:')
+eval_perform(Y_train,modelo.predict(X_train))
+print('\nTest set:')
+eval_perform(Y_test,modelo.predict(X_test))
 
 Yhat_prob = modelo.predict_proba(X)
 
