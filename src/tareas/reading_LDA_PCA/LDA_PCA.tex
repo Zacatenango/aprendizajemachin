@@ -54,7 +54,24 @@ The paper does not address two relevant differences that explain a key differenc
 
 PCA is unsupervised: it ignores the class labels (the dependent variable), instead it only finds principal components (directions) that maximize variance in the data set, and the resulting axes represent principal components (orthogonal directions of maximum variance). 
 
+% Para ignorar warnings acerca de overfull hbox, buscar latex-workshop.message.badbox.show en Settings
 In addition to the paper's stated differences: PCA has no limit on components. It is also scale-sensitive on account of focusing on variance, which scales with the square of the measurement units; this is why standardization gave a smaller average percent error on PCA in the paper.
+\\
+
+
+\paragraph{Question 2} Which proposal was bettern in terms of average percent error?
+
+LDA, with a 14.57\% average error, versos 17.83\% for PCA with preprocessing and 19.56\% for PCA without preprocessing.
+\\
+
+
+\paragraph{Question 3} Numerically, what is the impact of dimensionality reduction techniques?
+
+PCA without preprocessing reduces the average percent error by 2.33 percent points (10.6\%), with preprocessing it reduces the error by 4.06 percent points (18.65\%), LDA reduces the error by 7.32 percent points (33.4\%).
+
+Notice that this baseline only uses two out of 215 attributes; this analysis measures reduction against weak feature selection, not against full dimensional regression.
+
+
 
 
 
