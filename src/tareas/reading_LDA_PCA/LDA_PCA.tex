@@ -30,10 +30,6 @@
 
 \maketitle
 
-\begin{abstract}
-Abstracto
-\end{abstract}
-
 \begin{IEEEkeywords}
 Linear Discriminant Analysis, Principal Component Analysis, dimensionality reduction.
 \end{IEEEkeywords}
@@ -70,6 +66,20 @@ LDA, with a 14.57\% average error, versos 17.83\% for PCA with preprocessing and
 PCA without preprocessing reduces the average percent error by 2.33 percent points (10.6\%), with preprocessing it reduces the error by 4.06 percent points (18.65\%), LDA reduces the error by 7.32 percent points (33.4\%).
 
 Notice that this baseline only uses two out of 215 attributes; this analysis measures reduction against weak feature selection, not against full dimensional regression.
+\\
+
+
+\paragraph{Question 4} Explain in your own words what the proposal LDA-PLS is, as per your understanding. Try to think on possible improvements or future exploration work.
+
+\textbf{LDA-PLS} is a proposed improvement of LDA that uses the partial least squares method on the features matrix \textbf{X}, but swapping the dependent variables vector \textbf{y} with \textbf{X} projected in the direction of LDA's calculated projection $\mathbf{w}_{LDA}$. Then the projection of \textbf{X} in LDA's calculated direction is substracted from \textbf{X}, the result of PLS is concatenated into a results matrix $\mathbf{B}_{LDA-PLS}$, the projection calculated from LDA is concatenated into an LDA results matrix $\mathbf{W}_{LDA-PLS}$, and the process continues until we have gone through all the latent variables. \textbf{ex-LDA-PLS} is a weighted sum of the outputs of plain LDA and LDA-PLS via a $\lambda$ factor, where $\lambda = 0$ only leaves the result of LDA, $\lambda = 1$ leaves only the result of LDA-PLS, and anything in between blends both results.
+
+Future work can be done into extending LDA-PLS into multi-class variables (right now everything is binary; this is a non-trivial extension), a better way to find $\lambda$ than simple brute force, evaluating the computational cost of LDA-PLS (the authors didn't), or implementing kernelization for non-linear boundaries.
+\\
+
+
+\paragraph{Question 5} What are the benefits of the proposal compared to traditional methods?
+
+The benefit is that LDA-PLS and ex-LDA-PLS both beat traditional methods in both small and large datasets; ex-LDA-PLS seems to work best on large data, and LDA-PLS seems to be better in small data. LDA-PLS fixes LDA's ``blind spot'' without abandoning it, by making the direction of the projection adjustable. It also needs less components.
 
 
 
