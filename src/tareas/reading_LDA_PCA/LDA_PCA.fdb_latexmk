@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1790203936.90646 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/tareas/reading_LDA_PCA/LDA_PCA.tex" "LDA_PCA.pdf" "LDA_PCA" 1790203937.47759 0
+["pdflatex"] 1790204972.93921 "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/tareas/reading_LDA_PCA/LDA_PCA.tex" "LDA_PCA.pdf" "LDA_PCA" 1790204973.45256 0
   "/etc/texmf/web2c/texmf.cnf" 1764119026.4066 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/tareas/reading_LDA_PCA/LDA_PCA.tex" 1790203936.73184 5271 7c19a1da6bec2698ab2fdbae154eba80 ""
+  "/home/usuario/programacion/ITESO/semestre3/aprendizajemachin/src/tareas/reading_LDA_PCA/LDA_PCA.tex" 1790204972.76786 5603 9f7b38e3d7d7effdc7923d9e88100550 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -178,9 +178,9 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1741904018 41538 c016915c1d51223b6dbbfe27341748a8 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1789675510 5343802 4d13b086ed2f4a8fd96f4618b0724773 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1789675916 1980043 269f28f3532df3d0c9544e1a17991a9c ""
-  "LDA_PCA.aux" 1790203937.42384 1479 d3f994393302ffd7005502a942454dfa "pdflatex"
-  "LDA_PCA.out" 1790203937.42384 180 f0a8cedf1de0d0cca1364a918748f857 "pdflatex"
-  "LDA_PCA.tex" 1790203936.73184 5271 7c19a1da6bec2698ab2fdbae154eba80 ""
+  "LDA_PCA.aux" 1790204973.40786 1479 d3f994393302ffd7005502a942454dfa "pdflatex"
+  "LDA_PCA.out" 1790204973.40786 180 f0a8cedf1de0d0cca1364a918748f857 "pdflatex"
+  "LDA_PCA.tex" 1790204972.76786 5603 9f7b38e3d7d7effdc7923d9e88100550 ""
   (generated)
   "LDA_PCA.aux"
   "LDA_PCA.log"

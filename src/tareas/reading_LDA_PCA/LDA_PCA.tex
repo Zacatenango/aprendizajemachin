@@ -26,7 +26,7 @@
 
 \title{LDA and PCA}
 
-\author{Author Name}
+\author{Acoyani Garrido Sandoval}
 
 \maketitle
 
@@ -55,15 +55,15 @@ In addition to the paper's stated differences: PCA has no limit on components. I
 \\
 
 
-\paragraph{Question 2} Which proposal was bettern in terms of average percent error?
+\paragraph{Question 2} Which proposal was better in terms of average percent error?
 
-LDA, with a 14.57\% average error, versos 17.83\% for PCA with preprocessing and 19.56\% for PCA without preprocessing.
+LDA, with a 14.57\% average error, versus 17.83\% for PCA with preprocessing and 19.56\% for PCA without preprocessing.
 \\
 
 
 \paragraph{Question 3} Numerically, what is the impact of dimensionality reduction techniques?
 
-PCA without preprocessing reduces the average percent error by 2.33 percent points (10.6\%), with preprocessing it reduces the error by 4.06 percent points (18.65\%), LDA reduces the error by 7.32 percent points (33.4\%).
+PCA without preprocessing reduces the average percent error by 2.33 percentage points (10.6\%), with preprocessing it reduces the error by 4.06 percentage points (18.5\%), LDA reduces the error by 7.32 percentage points (33.4\%).
 
 Notice that this baseline only uses two out of 215 attributes; this analysis measures reduction against weak feature selection, not against full dimensional regression.
 \\
@@ -71,7 +71,7 @@ Notice that this baseline only uses two out of 215 attributes; this analysis mea
 
 \paragraph{Question 4} Explain in your own words what the proposal LDA-PLS is, as per your understanding. Try to think on possible improvements or future exploration work.
 
-\textbf{LDA-PLS} is a proposed improvement of LDA that uses the partial least squares method on the features matrix \textbf{X}, but swapping the dependent variables vector \textbf{y} with \textbf{X} projected in the direction of LDA's calculated projection $\mathbf{w}_{LDA}$. Then the projection of \textbf{X} in LDA's calculated direction is substracted from \textbf{X}, the result of PLS is concatenated into a results matrix $\mathbf{B}_{LDA-PLS}$, the projection calculated from LDA is concatenated into an LDA results matrix $\mathbf{W}_{LDA-PLS}$, and the process continues until we have gone through all the latent variables. \textbf{ex-LDA-PLS} is a weighted sum of the outputs of plain LDA and LDA-PLS via a $\lambda$ factor, where $\lambda = 0$ only leaves the result of LDA, $\lambda = 1$ leaves only the result of LDA-PLS, and anything in between blends both results.
+\textbf{LDA-PLS} is a proposed improvement of LDA that uses the partial least squares method on the features matrix \textbf{X}, but swapping the dependent variables vector \textbf{y} with \textbf{X} projected in the direction of LDA's calculated projection $\mathbf{w}_{LDA}$. Then the projection of \textbf{X} in LDA's calculated direction is subtracted from \textbf{X}, the result of PLS is concatenated into a results matrix $\mathbf{B}_{LDA-PLS}$, the projection calculated from LDA is concatenated into an LDA results matrix $\mathbf{W}_{LDA-PLS}$, and the process continues until we have gone through all the latent variables. \textbf{ex-LDA-PLS} is a weighted sum of the outputs of plain LDA and LDA-PLS via a $\lambda$ factor, where $\lambda = 0$ only leaves the result of LDA, $\lambda = 1$ leaves only the result of LDA-PLS, and anything in between blends both results. PLS-LDA uses PLS to reduce the data and then runs LDA on it; whereas LDA-PLS gets first a direction from LDA and rotates it with PLS.
 
 Future work can be done into extending LDA-PLS into multi-class variables (right now everything is binary; this is a non-trivial extension), a better way to find $\lambda$ than simple brute force, evaluating the computational cost of LDA-PLS (the authors didn't), or implementing kernelization for non-linear boundaries.
 \\
@@ -79,7 +79,7 @@ Future work can be done into extending LDA-PLS into multi-class variables (right
 
 \paragraph{Question 5} What are the benefits of the proposal compared to traditional methods?
 
-The benefit is that LDA-PLS and ex-LDA-PLS both beat traditional methods in both small and large datasets; ex-LDA-PLS seems to work best on large data, and LDA-PLS seems to be better in small data. LDA-PLS fixes LDA's ``blind spot'' without abandoning it, by making the direction of the projection adjustable. It also needs less components.
+The benefit is that ex-LDA-PLS beats traditional methods on accuracy score in large datasets, whereas LDA-PLS beats traditional methods on small datasets; ex-LDA-PLS seems to overfit in smaller data sets. ex-LDA-PLS has an accuracy score of 0.9922 vs LDA 0.9576 on the Gas dataset; PCA collapses to 0.4958 on the Raman dataset; LDA-PLS reaches full accuracy with under 5 components where PCA needs about 15. LDA-PLS fixes LDA's ``blind spot'' without abandoning it, by making the direction of the projection adjustable.
 
 
 
