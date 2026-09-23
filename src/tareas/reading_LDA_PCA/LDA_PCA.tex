@@ -1,0 +1,62 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage[utf8]{inputenc}      % Codificación de entrada UTF-8
+\usepackage[T1]{fontenc}         % Codificación de salida T1
+\usepackage[official]{eurosym}   % Símbolo de euro
+\usepackage{siunitx}             % Paquete para unidades métricas
+\usepackage{textcomp}            % Tipografías compañeras
+%\usepackage{lmodern}             % Tipografía Latin Modern
+\usepackage{moreverb}            % Para escribir código
+\usepackage{listings}            % Listados de código con formato
+\usepackage{xcolor}              % Colores para los listados
+\usepackage{tfrupee}
+\usepackage{fontawesome5}
+\usepackage{parskip}
+\usepackage{hyperref}
+\usepackage{tasks}
+\usepackage{exsheets}
+\usepackage{enumitem}
+\usepackage{lastpage}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{apalike}
+\usepackage{relsize}
+
+\begin{document}
+
+\title{LDA and PCA}
+
+\author{Author Name}
+
+\maketitle
+
+\begin{abstract}
+Abstracto
+\end{abstract}
+
+\begin{IEEEkeywords}
+Linear Discriminant Analysis, Principal Component Analysis, dimensionality reduction.
+\end{IEEEkeywords}
+
+\section{LDA/PCA}
+
+
+
+
+\subsection{Questions}
+
+
+\paragraph{Question 1} According to the paper, what are the main differences between LDA and PCA?
+
+LDA is supervised: it needs categorical class labels (a dependent variable), and finds a projection direction that separates the classes. Its goal is to maximize between-class scatter over within-class scatter, and the resulting axes represent linear discriminants. 
+
+The paper does not address two relevant differences that explain a key difference in its result. First, LDA caps at $C - 1$ components. Second, LDA is invariant to feature rescaling: scaling the data set will only introduce the same scaling factor in the between-class scatter matrix and the within-class scatter matrix, and since LDA is about finding a vector that maximizes the Rayleigh quotient, where the numerator has the between-class scatter and the denominator has the within-class scatter, this introduced scale factor appears in both numerator and denominator and the result doesn't change.
+
+PCA is unsupervised: it ignores the class labels (the dependent variable), instead it only finds principal components (directions) that maximize variance in the data set, and the resulting axes represent principal components (orthogonal directions of maximum variance). 
+
+In addition to the paper's stated differences: PCA has no limit on components. It is also scale-sensitive on account of focusing on variance, which scales with the square of the measurement units; this is why standardization gave a smaller average percent error on PCA in the paper.
+
+
+
+
+\end{document}
