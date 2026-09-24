@@ -44,19 +44,32 @@ Support Vector Machine
 
 \paragraph{Question 1} How does an SVM work? What the main differences from traditional statistical techniques?
 
-a
+The SVM is a supervised classification technique that assigns individual cases with high-dimensional data to two or more previously established groups. It works by finding a hyperplane that separates the two labeled classes, identifies the observations closest to the hyperplane (those are the support vectors), and chooses the \textbf{maximum margin hyperplane} furthest away from the support vectors. It has a \textbf{soft margin} that takes into account that perfect separation is often not possible or desirable, \textbf{slack variables} that measure how far a point would have to move to be corectly clasified, and a \textbf{regularization constant} that exchanges misclassification against model complexity (lower C favors generalization, higher C fits training data harder).
+
+Training is done by fitting the hyperplane on the training set, tuning the hyperparameters (including the kernel) on the validation set, and measuring generalization on the testing set.
+
+The main difference between SVM and traditional statistical techniques is that, whereas traditional techniques for examining group differences (t-tests, variance analysis...) typically compare group averages on selected dependent variables, SVM uses a predictive algorithm to learn multivariate patterns that optimally discriminate between groups. The advantage is that SVM constructs a classifier to analyze complex data sets with many cases and independent variables, generates predictions about group membership for additional cases, explores the relative and multivariate contributions of included features, selects a subset of features that most strongly influence group membership, and formally computes the performance or generalizability of the classification solution as predictive accuracy.
+
+The main caveat is that SVMs tend to overfit due to their complex boundaries and many features.
 \\
 
 
-\paragraph{Question 2} Explain the main differences among Support vector machine (SVM), Logistic regression (LR) Linear discriminant analysis (LDA)
+\paragraph{Question 2} Explain the main differences among Support vector machine (SVM), Logistic regression (LR), and Linear discriminant analysis (LDA)
 
-Hhhhhh
+\begin{itemize}
+    \item \textbf{Support vector machine:} Modeling technique is a discriminant (decision boundary), separation technique is a hyperplane with maximum distance between marginal cases of each class, on its own it is linear but can be made nonlinear with a kernel, appropriate predictor variables are a large number of determinant predictor variables, best for large samples, computational time is in theory fast.
+    \item \textbf{Logistic regression:} Modeling technique is a discriminant, separation technique is a logistic function of probability of class membership, the logistic function is nonlinear but the decision boundary is linear, appropriate predictor variables are a small number of probabilistic predictor variables, best for large samples, computational time is in theory slower.
+    \item \textbf{Linear discriminant analysis:} Modeling technique is generative (modeling of class distributions), separation technique is linear function between centroids of each class, is linear, appropriate predictor variables are normally distributed and probabilistic predictor variables, best for small samples, computational time is in theory slower.
+\end{itemize}
+
+The main difference between LDA and the other two methods is that logistic regression and SVM model the decision boundary directly, whereas LDA models each class's distribution and assigns the class with higher probability. In addition, LDA carries the most restrictive assumptions (predictors are normally distributed, therefore it produces biased estimates when that's violated), whereas SVM has the least assumptions, making it more flexible and more capable of handling marginal cases better.
 \\
 
+\paragraph{Question 3} Explain what is a kernel transformation and how it might enhance the performance of SVMs when dealing with non-separable data?
 
-\paragraph{Question 3} Explain what is a kernel transformation and How does the kernel transformation may enhance the performance of SVMs when dealing with non-separable data?
+The kernel transformation is used when the data is not linearly separable in its original form, by transforming implicitly the training data into a higher dimensional feature space where the optimal decision boundary can be located with minimal computation cost. It is called a \textit{trick} because it computes inner products between points as they would be in the higher-dimensional space without actually transforming the data; because the high-dimensional coordinates are never actually built, the cost doesn't explode with the dimension of the feature space.
 
-skvrn
+The most common kernels are \textbf{linear kernel,} best for data with few features; \textbf{radial basis function (RBF)/Gaussian}, which is best for data that has many features; and the \textbf{polynomial kernel.}
 \\
 
 
