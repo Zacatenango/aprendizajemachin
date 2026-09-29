@@ -24,7 +24,7 @@ from sklearn.metrics import (accuracy_score, precision_score, recall_score,f1_sc
 from sklearn.metrics import (roc_curve,auc)
 
 #%% Load the data
-data = pd.read_csv('../Data/diabetes/diabetes.csv', delimiter=',')
+data = pd.read_csv('diabetes.csv', delimiter=',')
 
 """
 
