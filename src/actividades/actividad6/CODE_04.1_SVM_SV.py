@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model,svm
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.metrics import (accuracy_score,
                              precision_score,
                              recall_score)
@@ -15,6 +15,7 @@ def eval_perform(Y,Yhat):
     prec = precision_score(Y,Yhat,average='weighted')
     reca = recall_score(Y,Yhat,average='weighted')
     print('\n \t Accu \t Prec \t Reca\n Eval \t %0.3f \t %0.3f \t %0.3f'%(accu,prec,reca))
+    return accu,prec,reca
 
 
 #%% Generate the dataset (EXAMPLE 1)
@@ -121,15 +122,15 @@ param_grid = [
      'gamma': ['scale', 'auto', 0.1, 1, 10]},
 ]
 
+# Same folds for every model, so their CV scores are comparable
+cv = StratifiedKFold(n_splits=5)
+
 # It is posible to obtain a probability metric with probability=True
 grid_search = GridSearchCV(estimator=svm.SVC(probability=True,random_state=0),
                            param_grid=param_grid,
-                           scoring='accuracy', cv=5,
+                           scoring='accuracy', cv=cv,
                            refit=True, return_train_score=True, n_jobs=-1)
 grid_search.fit(X_train,Y_train)
-
-print('Best parameters:',grid_search.best_params_)
-print('Best CV accuracy: %0.3f'%grid_search.best_score_)
 
 #%% Grid search results (top 10 combinations)
 results = pd.DataFrame(grid_search.cv_results_)
@@ -151,15 +152,60 @@ plt.ylabel('gamma')
 plt.title('Grid search: rbf kernel')
 plt.show()
 
-#%% Evaluate the best model
-modelo = grid_search.best_estimator_
+#%% Select the model with the best CV score
+# Best combination of each kernel, then the kernel with the highest mean CV accuracy
+best_per_kernel = (results.sort_values('rank_test_score')
+                          .groupby('param_kernel').head(1)
+                          .set_index('param_kernel'))
+print(best_per_kernel[['params','mean_test_score','std_test_score']].to_string())
 
-print('\nTrain set:')
-eval_perform(Y_train,modelo.predict(X_train))
-print('\nTest set:')
-eval_perform(Y_test,modelo.predict(X_test))
+best_kernel = best_per_kernel['mean_test_score'].idxmax()
+best_params = best_per_kernel.loc[best_kernel,'params']
+print('\nSelected model: SVC',best_params)
+print('CV accuracy: %0.3f'%best_per_kernel.loc[best_kernel,'mean_test_score'])
+
+# Refit the selected model on the whole training set
+modelo = svm.SVC(probability=True,random_state=0,**best_params)
+modelo.fit(X_train,Y_train)
 
 Yhat_prob = modelo.predict_proba(X)
+
+#%% Linear regression model
+# Linear regression predicts a continuous value, so it is used as a classifier
+# by thresholding its output at 0.5
+def linreg_classify(model,X):
+    return (model.predict(X)>=0.5).astype(int)
+
+# CV accuracy on the same folds used by the grid search
+cv_scores_lr = []
+for idx_tr,idx_va in cv.split(X_train,Y_train):
+    lr = linear_model.LinearRegression()
+    lr.fit(X_train.iloc[idx_tr],Y_train.iloc[idx_tr])
+    cv_scores_lr.append(accuracy_score(Y_train.iloc[idx_va],
+                                       linreg_classify(lr,X_train.iloc[idx_va])))
+
+modelo_lr = linear_model.LinearRegression()
+modelo_lr.fit(X_train,Y_train)
+
+#%% Compare the selected SV model with linear regression
+comparison = []
+for name,predict,cv_mean,cv_std in [
+        ('SVC '+best_kernel, modelo.predict,
+         best_per_kernel.loc[best_kernel,'mean_test_score'],
+         best_per_kernel.loc[best_kernel,'std_test_score']),
+        ('Linear Regression', lambda X: linreg_classify(modelo_lr,X),
+         np.mean(cv_scores_lr), np.std(cv_scores_lr))]:
+    print('\n%s - Train set:'%name)
+    accu_tr,_,_ = eval_perform(Y_train,predict(X_train))
+    print('\n%s - Test set:'%name)
+    accu_te,prec_te,reca_te = eval_perform(Y_test,predict(X_test))
+    comparison.append({'Model': name, 'Accu_Train': accu_tr,
+                       'Accu_CV': cv_mean, 'Std_CV': cv_std,
+                       'Accu_Test': accu_te, 'Prec_Test': prec_te,
+                       'Reca_Test': reca_te})
+
+comparison = pd.DataFrame(comparison)
+print('\n',comparison.round(3).to_string(index=False))
 
 #%% View the decision boundary
 h = 0.1
@@ -171,14 +217,19 @@ Xnew = pd.DataFrame(np.c_[xx.ravel(),yy.ravel()])
 Z = modelo.predict(Xnew)
 Z = Z.reshape(xx.shape)
 
+Z_lr = linreg_classify(modelo_lr,Xnew).reshape(xx.shape)
+
 vs = modelo.support_vectors_
 
 indx = Y==1
 fig = plt.figure(figsize=(8,8))
 plt.scatter(X[0][indx],X[1][indx],c='g',label='Class: +1')
 plt.scatter(X[0][~indx],X[1][~indx],c='r',label='Class: -1')
-plt.contour(xx,yy,Z)
-plt.scatter(vs[:,0],vs[:,1],s=60,marker='x',facecolors='k')
+plt.contour(xx,yy,Z,levels=[0.5],colors='k')
+plt.contour(xx,yy,Z_lr,levels=[0.5],colors='b',linestyles='--')
+plt.scatter(vs[:,0],vs[:,1],s=60,marker='x',facecolors='k',label='Support vectors')
+plt.plot([],[],'k-',label='SVC '+best_kernel)
+plt.plot([],[],'b--',label='Linear Regression')
 plt.xlabel('x_1')
 plt.ylabel('x_2')
 plt.legend()

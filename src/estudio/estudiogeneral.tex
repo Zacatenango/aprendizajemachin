@@ -361,6 +361,16 @@ X_entreno = X_entreno.dropna()
 
 \section{Calidad de datos}
 
+La calidad de datos es una de las dimensiones más importantes del aprendizaje machín, por motivo de la ley \textit{GIGO} -- \textit{garbage in garbage out,} si entra basura sale basura. Debido a que la IA y el ML no son conscientes por más que Daniel Moskowitz intente decir lo contrario, los modelos de ML no son capaces de ``saber'' qué es ruido y qué es datos; todo está en los datos de entrenamiento, y cuando la calidad de los datos está comprometida, los modelos aprenden asociaciones incorrectas o pierden patrones. 
+
+Comenzamos obteniendo un informe numérico simple acerca de las medidas de tendencia central y de dispersión de cada columna.
+
+\begin{lstlisting}[language=Python]
+df.describe().T  # Nos conviene ver ese informe en forma transpuesta
+\end{lstlisting}
+
+El resultado es:
+
 
 
 

@@ -80,6 +80,7 @@ print(len(X_entreno.dropna()))
 
 # Calidad de datos
 # .T me saca la transpuesta
+print("df.describe():")
 print(df.describe().T)
 
 # Para ver esto más fácil, grafico
