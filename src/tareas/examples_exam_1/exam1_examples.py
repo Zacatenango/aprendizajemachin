@@ -82,6 +82,10 @@ SVM_poly.fit(X,Y)
 SVM_RBF.fit(X,Y)
 SVM_sigmoid.fit(X,Y)
 
+# We print the accuracies. Linear is the winner. This is because the rest of the kernels work with
+# distances or dot products between raw feature values, which are scale-sensitive operations; the
+# <proline> feature is large, around hundreds or thousands, so it drowns out other features.
+# Standardization might close the gap between the kernels.
 print(f"Linear kernel acc (winner!): {SVM_linear.score(X,Y)}")
 print(f"Polynomial kernel acc: {SVM_poly.score(X,Y)}")
 print(f"RBF kernel acc: {SVM_RBF.score(X,Y)}")
@@ -138,4 +142,79 @@ print(f"Quartile 3: {df_RI_Q3}")
 print(f"Interquartile range: {RI}")
 print(f"Outlier boundaries: [{lower_boundary}, {upper_boundary}]")
 print(f"{outliers} outliers")
+
+#%%
+# Question 4:
+# Using the following code as a baseline, implement a Principal Component Regression (PCR). Apply 
+# PCA with n_components=2, use the two principal components to predict Y, and print the resulting 
+# R^2 score. 
+# Create a DataFrame with the provided data 
+
+data_PCA = \
+{ 
+   'X1': \
+   [ 
+      -0.628064, 0.454107, -2.408356, 1.873823, 0.677415, 
+      -0.354787, -0.432426, 0.421368, -0.063577, -0.382207, 
+      0.667001, 0.417055, -0.270609, -0.388792, 0.010513, 
+      -0.478169, -0.603163, 0.709334, -0.399958, -1.615381, 
+      -0.920891, 0.648195, 0.172168, -0.295073, 0.994199 
+   ], 
+   'X2': \
+   [ 
+
+      2.221172, -0.833474, 2.296370, -1.927899, -0.144170, 
+      -1.023506, 1.507433, 0.682005, 1.271547, -0.772579, 
+      0.324521, -0.776366, -0.425321, 0.549275, 0.796260, 
+      0.511429, -0.426112, -1.099947, 1.509558, 1.281159, 
+      0.958367, 1.855177, -0.699722, 2.633824, 2.829990 
+   ], 
+   'X3': \
+   [ 
+      0.885491, -0.182709, -0.672890, 0.404781, 0.566716, 
+      -1.055556, 0.652896, 0.869389, 0.775485, -0.883938, 
+      0.907432, -0.101989, -0.516714, 0.071529, 0.605496, 
+      -0.154131, -0.851588, -0.100897, 0.724102, -0.658331, 
+      -0.139131, 1.948926, -0.418749, 1.585189, 2.887101 
+   ], 
+   'Y': \
+   [ 
+      -4.377992, 1.546347, -6.856543, 5.661865, 1.288684, 
+      1.441821, -2.923592, -0.387835, -2.099030, 0.805580, 
+      0.409962, 1.780960, 0.411427, -1.221638, -0.588051, 
+      -1.615428, -0.815173, 1.894955, -2.796798, -4.226549, 
+      -1.489206, -1.549154, 0.649229, -4.327162, -3.173072 
+   ] 
+} 
+
+df_PCA = pandas.DataFrame(data_PCA) 
+print(df_PCA.head()) 
+
+ 
+#%%
+# Answer:
+# Standardize the independent variables using StandardScaler
+# Important: Do not perform a train/test split. This requirement was put in place because, one day,
+# the professor found a very unusual scenario where the same seed number returned different results.
+# There are several reasons why this could happen: maybe a different Python version, or a Python
+# platform that isn't the standard reference CPython like Pypi or IronPython, or maybe different
+# versions of Numpy or scikit-learn...
+# Whatever the case, this thing that should never happen, happened; and since the goal is just 
+# comparing accuracy metrics between models, the professor told us in class that he determined the 
+# train/test split here is not necessary.
+from sklearn.preprocessing import StandardScaler
+X_std = StandardScaler().fit_transform(df_PCA[['X1','X2','X3']])
+
+# Apply PCA with n_components=2
+from sklearn.decomposition import PCA
+Z = PCA(n_components=2).fit_transform(X_std)
+
+# Fit a linear regression model using the two principal components
+from sklearn.linear_model import LinearRegression
+linear_regression_model_PCA = LinearRegression()
+linear_regression_model_PCA.fit(Z, df_PCA["Y"])
+
+# Print the R2 score
+print(f"R² score: {linear_regression_model_PCA.score(Z, df_PCA['Y'])}")
+
 
