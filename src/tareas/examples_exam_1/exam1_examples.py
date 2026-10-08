@@ -20,8 +20,6 @@ jaccard_data = \
 }
 jaccard_DF = pandas.DataFrame(jaccard_data, index=jaccard_index_labels)
 
-
-#%%
 # Preparation:
 # The Jaccard index is "len(both have it) / (len(both have it) + len(only one has it))"
 # In other words: "(both are 1) / (at least one is 1)" -- I've used it in patent prosecution to try 
@@ -38,6 +36,7 @@ jaccard_CD = both_1 / at_least_one_1
 jaccard_CD
 
 #%%
+# Answer:
 # Now we expand to all our users
 from itertools import combinations
 jaccard_dict = {}
@@ -53,4 +52,55 @@ jaccard_dict_sorted = sorted(jaccard_dict.items(), key=lambda X: X[1], reverse=T
 
 # This gave us a list of tuples from where we can fetch our top 2 users
 print(f"Most similar users: {jaccard_dict_sorted[0][0]}: {jaccard_dict_sorted[0][1]}")
+
+#%%
+# Question 3: Using the following code as a baseline, how many outliers do you detect in X1 using
+# the interquartile range method with a threshold of 1.5?
+# Create a DataFrame with the provided data (RI = rango intercuartílico, IQR in Spanish)
+data_RI = \
+{ 
+   'X1': \
+   [ 
+      -0.82, 0.14, 0.67, -1.05, 1.22, 
+       0.31, -0.44, 0.88, -0.19, 1.04, 
+      -0.73, 0.55, 0.02, -1.31, 0.76, 
+       0.43, -0.58, 1.15, -0.27, 0.95, 
+       6.40, -5.80, 7.10, -6.50, 0.24 
+   ] 
+} 
+ 
+
+df_RI = pandas.DataFrame(data_RI) 
+print(df_RI) 
+
+# Preparation:
+# Quantiles in PANDAS are obtained with <dataframe column>.quantile(<number of quantile from 0 to 1>)
+# Quantiles are defined as the percentile position in the data where X% of the values are below it.
+# The median is quantile 50; quartiles 1 and 3 are quantiles 25 and 75. Quantiles are usually
+# expressed with integer figures, but they're not necessarily discrete; continuous quantiles exist
+# too, and can be calculated via linear interpolation, e.g. quantile pi.
+df_RI_Q3 = df_RI["X1"].quantile(0.75)
+
+#%%
+# Answer:
+# Calculate the first quartile, Q1
+df_RI_Q1 = df_RI["X1"].quantile(0.25)
+
+# Calculate the third quartile, Q3
+df_RI_Q3 = df_RI["X1"].quantile(0.75)
+
+# Calculate the interquartile range, IQR
+RI = df_RI_Q3 - df_RI_Q1
+
+# Calculate the lower and upper outlier boundaries using a threshold of 1.5
+lower_boundary = df_RI_Q1 - (RI * 1.5)
+upper_boundary = df_RI_Q3 + (RI * 1.5)
+
+# Report the total number of outliers in X1
+outliers = ( (df_RI['X1'] < lower_boundary) | (df_RI['X1'] > upper_boundary) ).sum()
+print(f"Quartile 1: {df_RI_Q1}")
+print(f"Quartile 3: {df_RI_Q3}")
+print(f"Interquartile range: {RI}")
+print(f"Outlier boundaries: [{lower_boundary}, {upper_boundary}]")
+print(f"{outliers} outliers")
 
