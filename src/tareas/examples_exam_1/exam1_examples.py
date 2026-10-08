@@ -54,6 +54,41 @@ jaccard_dict_sorted = sorted(jaccard_dict.items(), key=lambda X: X[1], reverse=T
 print(f"Most similar users: {jaccard_dict_sorted[0][0]}: {jaccard_dict_sorted[0][1]}")
 
 #%%
+# Question 2: Using a Support Vector Machine for classification, determine which of the following 
+# kernels provides the highest accuracy score: linear, polynomial, RBF, or sigmoid. Use the 
+# following code to load the dataset: 
+# Loading data 
+from sklearn import datasets 
+wine = datasets.load_wine() 
+X = wine.data 
+Y = wine.target 
+Y_st = wine.target_names.tolist() 
+X_st = wine.feature_names 
+
+# Use 100% of the data; do not perform a train/test split.
+
+#%%
+# Answer:
+# Identify the kernel that produces the highest accuracy score.
+# Important: Use the default parameters of sklearn.svm.SVC, except for the kernel parameter. Do not standardize the variables. 
+from sklearn.svm import SVC
+SVM_linear = SVC(kernel="linear")
+SVM_poly = SVC(kernel="poly")
+SVM_RBF = SVC(kernel="rbf")
+SVM_sigmoid = SVC(kernel="sigmoid")
+
+SVM_linear.fit(X,Y)
+SVM_poly.fit(X,Y)
+SVM_RBF.fit(X,Y)
+SVM_sigmoid.fit(X,Y)
+
+print(f"Linear kernel acc (winner!): {SVM_linear.score(X,Y)}")
+print(f"Polynomial kernel acc: {SVM_poly.score(X,Y)}")
+print(f"RBF kernel acc: {SVM_RBF.score(X,Y)}")
+print(f"Sigmoid kernel acc: {SVM_sigmoid.score(X,Y)}")
+
+
+#%%
 # Question 3: Using the following code as a baseline, how many outliers do you detect in X1 using
 # the interquartile range method with a threshold of 1.5?
 # Create a DataFrame with the provided data (RI = rango intercuartílico, IQR in Spanish)
