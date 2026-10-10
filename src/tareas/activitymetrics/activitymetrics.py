@@ -66,26 +66,54 @@ def evaluate_model(model: LogisticRegression, X_test, Y_test, name):
    dist = numpy.sqrt(FPR**2 + (1-TPR)**2)
    index = numpy.argmin(dist)
    best_threshold = thresholds[index]
-   print(f"Best threshold: {best_threshold}")
+   sensitivity_best_thresh = TPR[index]
+   specificity_best_thresh = 1 - FPR[index]
 
-   return { "threshold": best_threshold }
+   # Print output
+   print(f"Best threshold: {best_threshold}")
+   print(f"Sensitivity: {sensitivity_best_thresh}")
+   print(f"Specificity: {specificity_best_thresh}")
+
+   # Plot specificity and sensitivity with best threshold
+   # (this answers question 3)
+   pyplot.figure()
+   pyplot.plot(thresholds, 1-FPR, label="Specificity")
+   pyplot.plot(thresholds, TPR, label="Sensitivity")
+   pyplot.title(f"Specificity and sensitivity: {name}")
+   pyplot.axvline(best_threshold, color="red")
+   pyplot.legend()
+
+   # Plot ROC curve (this answers question 4)
+   pyplot.figure()
+   pyplot.plot(FPR, TPR, label=f"{name} (AUC = {integral:.3f})")
+   pyplot.plot([0,1], [0,1], "--")
+   pyplot.xlabel("1 - specificity")
+   pyplot.ylabel("Sensitivity")
+   pyplot.legend()
+   pyplot.title(f"ROC curve: {name}")
+   
+   return { "threshold": best_threshold, "integral": integral }
 
 # We predict, and evaluate our model.
-# For this run, the results are 0.775 accuracy, 0.751 precision, 0.755 recall, and 0.813 F1.
+# For this run, the results are 0.755 accuracy, 0.751 precision, 0.755 recall, and 0.813 F1.
 # Recall is the same as accuracy because a recall on weighted average is mathematically identical 
-# to accuracy. 
-Yhat_test = logistic_regression_model.predict(X_test_scaled)
-eval_perform(Y_test, Yhat_test)
-evaluate_model(logistic_regression_model, X_test, Y_test, "")
-
-#%%
-# 3) Find optimal decision threshold (plot)
-
-#%%
-# 4) Plot ROC curve
+# to accuracy.
+logistic_result = evaluate_model(logistic_regression_model, X_test_scaled, Y_test, "Logistic")
 
 #%%
 # 5) Try a polynomial regression (you choose the grade), repeat steps 2-4 with this model.
+# I chose grade 2 because higher grades imply a higher risk of overfitting
+from sklearn.preprocessing import PolynomialFeatures
+polynomial = PolynomialFeatures(degree=2)
+X_train_poly = polynomial.fit_transform(X_train_scaled)
+X_test_poly = polynomial.transform(X_test_scaled)
+
+# We create a new model and fit it on our polynomial-transformed independent variables
+# We need more iterations because polynomial transformation increased the amount of features
+polynomial_regression_model = LogisticRegression(max_iter=5000)
+polynomial_regression_model.fit(X_train_poly, Y_train)
+polynomial_result = evaluate_model(polynomial_regression_model, X_test_poly, Y_test, "Polynomial")
+
 
 #%%
 # 6) Conclusion, find the most robust model using AUC.
