@@ -217,4 +217,3 @@ linear_regression_model_PCA.fit(Z, df_PCA["Y"])
 # Print the R2 score
 print(f"R² score: {linear_regression_model_PCA.score(Z, df_PCA['Y'])}")
 
-
