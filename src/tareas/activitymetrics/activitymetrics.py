@@ -23,7 +23,8 @@ y["quality"] = (y["quality"] >= 6).astype(int)
 #%%
 # Preparation
 # We start out by assessing the percentage of 1's we have in y["quality"]
-# Since we binarized that column in the assignment setup, we just need to average everything
+# Since we binarized that column in the assignment setup, we just need to average everything. This
+# 
 share_of_ones = y["quality"].mean()
 print(f"Share of 1's: {share_of_ones}")
 
@@ -115,5 +116,22 @@ polynomial_regression_model.fit(X_train_poly, Y_train)
 polynomial_result = evaluate_model(polynomial_regression_model, X_test_poly, Y_test, "Polynomial")
 
 
-#%%
+# %%
 # 6) Conclusion, find the most robust model using AUC.
+# We use AUC because it measures the model's performance across all thresholds, not just at 0.5
+# Compared with the baseline prediction accuracy, which is the share of ones in the independent
+# variable, both models have an AUC higher than the baseline, which suggests they are both robust.
+# While the polynomial regression's accuracy is just marginally higher by 1.2 percent points, it 
+# still is decently more robust because it has a 4.2 percent points higher specificity (less risk of
+# mistakenly labeling bad wines as good).
+best_model = "polynomial" if polynomial_result["integral"] > logistic_result["integral"] else "logistic"
+print(f"The winner model is: {best_model}!")
+print(f"AUC of polynomial regression: {polynomial_result['integral']}")
+print(f"AUC of logistic regression: {logistic_result['integral']}")
+print(f"Baseline (share of ones): {share_of_ones}")
+
+# Limitations:
+# - This is only a single 70/30 split, cross-validation would confirm whether the 0.014 increase in
+#   polynomial regression's AUC is real or just noise.
+# - The best threshold was found on the test set, which leaks test information.
+# - The class function mixes weighted precision and recall with binary F1
