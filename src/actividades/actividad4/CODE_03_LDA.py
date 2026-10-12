@@ -102,7 +102,8 @@ plt.show()
 
 #%% Aplying the LDA
 lda_model = LDA(store_covariance=True,n_components=None)
-#If True, explicitly compute the weighted within-class covariance matrix when solver is ‘svd’. The matrix is always computed and stored for the other solvers.
+#If True, explicitly compute the weighted within-class covariance matrix when solver is ‘svd’. 
+# The matrix is always computed and stored for the other solvers.
 lda_model = lda_model.fit(X,Y[:,0])
 
 # View the covariance ratio
