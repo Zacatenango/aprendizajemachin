@@ -9,7 +9,12 @@ import pandas as pd
 from itertools import combinations
 import numpy
 
-#%%  Loading data
+
+
+
+#%%
+# Question 14
+# Loading data
 
 iris = datasets.load_iris()
 X=iris.data
@@ -19,7 +24,11 @@ X_st=iris.feature_names
 
 #USE 100% of DATA (no train/test split)
 
+
+
+
 #%% 
+# Answer of question 14
 LDAmodel = LinearDiscriminantAnalysis(store_covariance=True, n_components=None)
 LDAmodel_fit = LDAmodel.fit(X,Y)
 X_new = LDAmodel_fit.transform(X)
@@ -31,7 +40,11 @@ reca = recall_score(Y,Yhat,average='weighted')
 f1_train = f1_score(Y,Yhat,average="weighted")
 print('\n\t Accu \t Prec \t Reca \t F1\nEval \t %0.3f \t %0.3f \t %0.3f \t %0.3f' % (accu, prec, reca, f1_train))
 
+
+
+
 #%%
+# Question 15
 # Use the following base code to determine the users that are most similar according to the Jaccard 
 # similarity index.
 
@@ -55,8 +68,11 @@ index_labels = ['A', 'B', 'C', 'D', 'E', 'F']
 # Create DataFrame
 df = pd.DataFrame(data, index=index_labels)
 
+
+
+
 #%%
-# Answer
+# Answer of question 15
 import numpy
 jaccard_dict = {}
 jaccard_DF = df
@@ -73,7 +89,11 @@ jaccard_dict_sorted = sorted(jaccard_dict.items(), key=lambda X: X[1], reverse=T
 # This gave us a list of tuples from where we can fetch our top 2 users
 print(f"Most similar users: {jaccard_dict_sorted[0][0]}: {jaccard_dict_sorted[0][1]}")
 
+
+
+
 #%%
+# Question 16
 import numpy as np
 import pandas as pd
 
@@ -103,7 +123,11 @@ data = {
 
 df = pd.DataFrame(data)
 
+
+
+
 #%%
+# Answer of question 16
 # Implement PLS with n=2
 df_PLS = df
 from sklearn.cross_decomposition import PLSRegression
@@ -121,3 +145,36 @@ linear_reg = LinearRegression().fit(transformation, Y)
 # Your code must print the R2 score
 Yhat = PLS.predict(X)
 print(f"R2 score: {linear_reg.score(transformation, Y)}")
+
+
+
+
+#%% 
+# Question 17
+import pandas as pd
+
+# Create a DataFrame with the provided data
+data = {
+    'X1': [0.2088635950047554, -0.7198442083947086, -0.6017066122293969, -0.38508228041631654, -0.5622875292409727,
+           -0.22577630048653566, 5.132674331133561, -5.182702182736474, 1.5792128155073915, 1.5230298564080254,
+           -0.9080240755212109, -0.3092123758512146, 0.5425600435859647, -2.1967188783751195, 9.154021177020741,
+           0.19686123586912352, 0.3436182895684614, -7.020530938773524, -0.11564828238824053, -1.0577109289559004,
+           0.37569801834567196, 1.030999522495951, 0.4967141530112327, 0.24196227156603412, -0.5443827245251827]
+}
+
+df = pd.DataFrame(data)
+
+
+
+
+#%%
+# Answer of question 17
+# How many outliers do you detect in X1 using Inter Quartile Range with a threshold of 1.5?
+quartile_1 = df["X1"].quantile(0.25)
+quartile_3 = df["X1"].quantile(0.75)
+IQR = quartile_3 - quartile_1
+threshold = 1.5
+lower_bound = quartile_1 - (IQR * threshold)
+upper_bound = quartile_3 + (IQR * threshold)
+nr_outliers = ( (df["X1"] < lower_bound) | (df['X1'] > upper_bound) ).sum()
+print(f"Outliers: {nr_outliers}")
