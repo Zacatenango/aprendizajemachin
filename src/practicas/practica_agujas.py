@@ -188,3 +188,171 @@ pyplot.xlabel("Replacement threshold T (hours)"); pyplot.ylabel("Cost per 1,000 
 pyplot.title("Cost frontier"); pyplot.legend()
 pyplot.savefig("cost_frontier.png", dpi=150, bbox_inches="tight")
 pyplot.show()
+
+
+
+
+
+#%%
+# Step 6a: modeling setup (shared by all model cells)
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import StratifiedKFold, KFold, cross_val_score, cross_val_predict
+from sklearn.metrics import roc_auc_score, recall_score, precision_score, f1_score, r2_score, mean_absolute_error
+
+# Classification data: one row per machine-week. Target: did the needle fail this week?
+# Leakage guard: only information known at the START of the week. Cost columns, replacement
+# flags and end-of-week hours are excluded because they reveal the outcome.
+features = ["Cumulative_Hours_Start", "Weekly_Working_Hours"] + sensors
+X_week = pandas.get_dummies(DF[features + ["Season"]], columns=["Season"], drop_first=True, dtype=float)
+y_week = DF["Failure"]
+
+# Back test: train on the first 70% of weeks, test on the last 30% (time order, no shuffling,
+# so the model never sees the future).
+cut = DF["Week"].quantile(0.70)
+train, test = DF["Week"] <= cut, DF["Week"] > cut
+Xtr, Xte, ytr, yte = X_week[train], X_week[test], y_week[train], y_week[test]
+print(f"Train weeks <= {cut:.0f}: {ytr.sum()} failures / {len(ytr)} rows; test: {yte.sum()} / {len(yte)}")
+
+cv_clf = StratifiedKFold(n_splits=5, shuffle=True, random_state=297974)
+clf_results = []
+
+def evaluate_classifier(name, model):
+    """5-fold CV AUC on train, then fit on train and score on the held-out future weeks."""
+    cv_auc = cross_val_score(model, Xtr, ytr, cv=cv_clf, scoring="roc_auc")
+    model.fit(Xtr, ytr)
+    prob = model.predict_proba(Xte)[:, 1] if hasattr(model, "predict_proba") else model.decision_function(Xte)
+    pred = model.predict(Xte)
+    row = {"Model": name, "CV_AUC": float(cv_auc.mean()), "CV_AUC_sd": float(cv_auc.std()),
+           "Test_AUC": roc_auc_score(yte, prob), "Test_Recall": recall_score(yte, pred),
+           "Test_Precision": precision_score(yte, pred, zero_division=0), "Test_F1": f1_score(yte, pred)}
+    clf_results.append(row)
+    print({k: (round(v, 3) if isinstance(v, float) else v) for k, v in row.items()})
+    return model
+
+
+
+
+
+#%%
+# Model 1: logistic regression. class_weight="balanced" because failures are only ~1% of weeks
+from sklearn.linear_model import LogisticRegression
+logit = evaluate_classifier("Logistic regression",
+    make_pipeline(StandardScaler(), LogisticRegression(class_weight="balanced", max_iter=1000)))
+
+
+
+
+
+#%%
+# Model 2: PCA + logistic regression (PCA compresses the 10 correlated inputs to 4 components)
+from sklearn.decomposition import PCA
+pca_logit = evaluate_classifier("PCA(4) + logistic",
+    make_pipeline(StandardScaler(), PCA(n_components=4), LogisticRegression(class_weight="balanced", max_iter=1000)))
+
+
+
+
+
+#%%
+# Model 3: LDA. No class_weight option; equal priors play the same role for the imbalance
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+lda = evaluate_classifier("LDA",
+    make_pipeline(StandardScaler(), LinearDiscriminantAnalysis(priors=[0.5, 0.5])))
+
+
+
+
+
+#%%
+# Model 4: LDA as dimension reduction + logistic regression (binary target -> 1 LDA component)
+lda_logit = evaluate_classifier("LDA(1) + logistic",
+    make_pipeline(StandardScaler(), LinearDiscriminantAnalysis(n_components=1),
+                  LogisticRegression(class_weight="balanced", max_iter=1000)))
+
+
+
+
+
+#%%
+# Model 5: SVC with RBF kernel. Scaling is essential for SVMs (see the practice set, exercise 2)
+from sklearn.svm import SVC
+svc = evaluate_classifier("SVC (RBF)",
+    make_pipeline(StandardScaler(), SVC(kernel="rbf", class_weight="balanced", probability=True, random_state=297974)))
+
+
+
+
+
+#%%
+# Classification comparison table
+clf_table = pandas.DataFrame(clf_results).round(3)
+print(clf_table.to_string(index=False))
+
+
+
+
+
+#%%
+# Step 6b: regression setup. One row per FAILED needle (30). Target: hours at failure.
+# Predictors: the needle's average operating conditions over its life.
+failed_ids = needles.index[needles.Failed == 1]
+life = (DF[DF.Needle_ID.isin(failed_ids)]
+          .groupby("Needle_ID")[sensors + ["Weekly_Working_Hours"]].mean())
+X_life = life
+y_life = needles.loc[life.index, "Hours"]
+cv_reg = KFold(n_splits=5, shuffle=True, random_state=297974)
+reg_results = []
+
+def evaluate_regressor(name, model):
+    """30 needles are too few for a holdout split, so all evaluation is 5-fold cross-validation."""
+    pred = cross_val_predict(model, X_life, y_life, cv=cv_reg)
+    row = {"Model": name, "CV_R2": r2_score(y_life, pred), "CV_MAE_hours": mean_absolute_error(y_life, pred)}
+    reg_results.append(row)
+    print({k: (round(v, 3) if isinstance(v, float) else v) for k, v in row.items()})
+
+
+
+
+
+#%%
+# Model 6: linear regression
+from sklearn.linear_model import LinearRegression
+evaluate_regressor("Linear regression", make_pipeline(StandardScaler(), LinearRegression()))
+
+
+
+
+
+#%%
+# Model 7: PCA + linear regression (principal component regression, like exam practice ex. 4)
+evaluate_regressor("PCA(2) + linear (PCR)", make_pipeline(StandardScaler(), PCA(n_components=2), LinearRegression()))
+
+
+
+
+
+#%%
+# Model 8: PLS regression (supervised components, like Exam 1 question 16)
+from sklearn.cross_decomposition import PLSRegression
+evaluate_regressor("PLS (2 components)", make_pipeline(StandardScaler(), PLSRegression(n_components=2)))
+
+
+
+
+
+#%%
+# Model 9: SVR (RBF kernel, epsilon-insensitive tube)
+from sklearn.svm import SVR
+evaluate_regressor("SVR (RBF)", make_pipeline(StandardScaler(), SVR(kernel="rbf", C=1000, epsilon=200)))
+
+
+
+
+
+#%%
+# Baseline: always predict the mean lifetime. A useful model must beat this.
+from sklearn.dummy import DummyRegressor
+evaluate_regressor("Baseline (mean)", DummyRegressor())
+reg_table = pandas.DataFrame(reg_results).round(3)
+print(reg_table.to_string(index=False))
