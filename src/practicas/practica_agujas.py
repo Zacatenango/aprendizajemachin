@@ -356,3 +356,53 @@ from sklearn.dummy import DummyRegressor
 evaluate_regressor("Baseline (mean)", DummyRegressor())
 reg_table = pandas.DataFrame(reg_results).round(3)
 print(reg_table.to_string(index=False))
+
+
+
+
+
+#%%
+# Step 7: back test of the policy. Choose T on some machines, check it on machines never seen.
+# Same logic as simulate(), but on a subset of needles.
+def simulate_on(T, subset):
+    cost = hours = failures = 0
+    for H, F, P in zip(subset.Hours, subset.Failed, subset.Preventive):
+        if F == 1 and H <= T:   cost += 30_000; hours += H; failures += 1
+        elif H >= T:            cost += 10_000; hours += T
+        elif P == 1:            cost += 10_000; hours += H
+        else:                   hours += H
+    return cost / hours * 1000, failures
+
+rows = []
+for test_machines in [[1, 2, 3], [4, 5, 6], [7, 8, 9, 10]]:      # 3-fold CV by machine
+    tr = needles[~needles.Machine.isin(test_machines)]
+    te = needles[needles.Machine.isin(test_machines)]
+    grid = range(3000, 10001, 250)
+    T_best = min(grid, key=lambda T: simulate_on(T, tr)[0])      # chosen on training machines only
+    cost_policy, f_policy = simulate_on(T_best, te)
+    cost_rtf, f_rtf = simulate_on(numpy.inf, te)
+    rows.append({"Test machines": str(test_machines), "T chosen on train": T_best,
+                 "Test cost/1000h (policy)": round(cost_policy), "Test cost/1000h (run to failure)": round(cost_rtf),
+                 "Saving %": round(100 * (1 - cost_policy / cost_rtf), 1),
+                 "Test failures (policy vs RTF)": f"{f_policy} vs {f_rtf}"})
+backtest = pandas.DataFrame(rows)
+print(backtest.to_string(index=False))
+
+
+
+
+
+#%%
+# Sensitivity: does the best T move if a failure costs more or less than $20,000 extra?
+for downtime in [10_000, 20_000, 40_000]:
+    def rate(T):
+        c = h = 0
+        for H, F, P in zip(needles.Hours, needles.Failed, needles.Preventive):
+            if F == 1 and H <= T: c += 10_000 + downtime; h += H
+            elif H >= T:          c += 10_000; h += T
+            elif P == 1:          c += 10_000; h += H
+            else:                 h += H
+        return c / h * 1000
+    T_star = min(range(3000, 10001, 250), key=rate)
+    print(f"Downtime cost ${downtime:,}: best T = {T_star} h, cost/1000h = {rate(T_star):.0f} "
+          f"(run to failure = {rate(numpy.inf):.0f})")
