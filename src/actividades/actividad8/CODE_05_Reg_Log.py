@@ -81,7 +81,7 @@ from sklearn.metrics import (accuracy_score,precision_score,
                              recall_score)
 
 #%% Import the dataset
-data = pd.read_csv('../Data/ex2data2.txt',header=None)
+data = pd.read_csv('ex2data2.txt',header=None)
 X = data.iloc[:,0:2]
 Y = data.iloc[:,2]
 plt.scatter(X[0],X[1],c=Y)
@@ -125,7 +125,7 @@ plt.show()
 #%% View the overfiting by means the model coefficients
 W = modelo.coef_
 plt.bar(np.arange(len(W[0])),W[0])
-plt.xticks(np.arange(len(W[0])),poly.get_feature_names(), rotation='vertical')
+plt.xticks(np.arange(len(W[0])),poly.get_feature_names_out(), rotation='vertical')
 plt.show()
 
 #%% Import the model for later
@@ -166,10 +166,10 @@ W = modelo.coef_
 W_min =  min_model.coef_
 plt.subplot(2,1,1)
 plt.bar(np.arange(len(W[0])),W[0])
-plt.xticks(np.arange(len(W[0])),poly.get_feature_names(), rotation='vertical')
+plt.xticks(np.arange(len(W[0])),poly.get_feature_names_out(), rotation='vertical')
 plt.subplot(2,1,2)
 plt.bar(np.arange(len(W_min[0])),W_min[0])
-plt.xticks(np.arange(len(W_min[0])),np.array(poly.get_feature_names())[indx], rotation='vertical')
+plt.xticks(np.arange(len(W_min[0])),np.array(poly.get_feature_names_out())[indx], rotation='vertical')
 plt.tight_layout()
 plt.show()
 

@@ -95,7 +95,7 @@ model = Sequential(
 
 # https://keras.io/optimizers/
 sgd = SGD(learning_rate=0.001, weight_decay=0.001, momentum=0.99)
-#adam = Adam()
+adam = Adam()
 
 #https://keras.io/api/losses/
 model.compile(loss='mean_squared_error',
