@@ -150,5 +150,21 @@ reca_test = recall_score(Y_test,Yhat_test,average='weighted')
 print(' \t\t Accu \t Prec \t Reca\n Train \t %0.3f \t %0.3f \t %0.3f\n  Test \t %0.3f \t %0.3f \t %0.3f'%(accu_train,prec_train,reca_train,accu_test,prec_test,reca_test))
 
 
-#%%
+#%% Heatmap of the weights in the hidden layers
+import seaborn as sns  # for the heatmap
 
+# Get weights from the model
+weights = model.get_weights()
+
+# Visualize the weights of each layer
+for i, layer_weights in enumerate(weights):
+    if len(layer_weights.shape) == 2:  # Only consider the weight matrices, not biases
+        #Weight matrices capture the strength and direction of connections between neurons across layers. WX 
+        #Biases for shifting activation  is the contanst (the b)  in WX + b  
+        fig = plt.figure(figsize=(8,6))
+        sns.heatmap(layer_weights, annot=True, cmap='coolwarm', cbar=True)
+        plt.title(f'Heatmap of Weights for Layer {i//2 + 1}')
+        plt.xlabel('Neurons')
+        plt.ylabel('Input Features' if i == 0 else 'Neurons from Previous Layer')
+        plt.show()
+ 
