@@ -136,7 +136,7 @@ best_params = {}
 for lr, wd, mom in itertools.product(learning_rates, weight_decays, momentums):
     sgd = SGD(learning_rate=lr, weight_decay=wd, momentum=mom)
     model.compile(loss='mean_squared_error', optimizer=sgd)
-    history = model.fit(X, Y, epochs=10, verbose=0,batch_size=1000)
+    history = model.fit(X, Y, epochs=300, verbose=0, batch_size=1000)
     Yhat = model.predict(X)
     r2 = r2_score(Y, Yhat)
     if r2 > best_r2:

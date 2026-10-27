@@ -21,11 +21,11 @@ plt.title("Original Data")
 plt.show()
 
 # Create and train the MLP model
-model = MLPRegressor(hidden_layer_sizes=(10, 10, 10),
-                     activation='relu',
+model = MLPRegressor(hidden_layer_sizes=(40, 30, 20, 10),
+                     activation='tanh',
                      solver='sgd',
                      learning_rate_init=0.001,
-                     max_iter=500,
+                     max_iter=50000,
                      batch_size=100,
                      verbose=True)
 
