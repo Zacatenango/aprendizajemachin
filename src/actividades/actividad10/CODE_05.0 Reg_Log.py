@@ -84,7 +84,7 @@ from sklearn.metrics import (accuracy_score,precision_score,
                              recall_score)
 
 #%% Import the dataset
-data = pd.read_csv('../Data/ex2data2.txt',header=None)
+data = pd.read_csv('ex2data2.txt',header=None)
 X = data.iloc[:,0:2]
 Y = data.iloc[:,2]
 plt.scatter(X[0],X[1],c=Y)

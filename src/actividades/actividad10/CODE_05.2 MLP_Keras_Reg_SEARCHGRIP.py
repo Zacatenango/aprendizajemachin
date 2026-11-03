@@ -52,7 +52,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 
 
 #%% Import dataset
-data = pd.read_csv('../Data/Airfoil_Self_Noise/airfoil_self_noise.dat', sep='\t', header=None)
+data = pd.read_csv('airfoil_self_noise.dat', sep='\t', header=None)
 names = ['Freq', 'Angle', 'Chord', 'Velocity', 'Suction', 'Sound']
 data.columns = names
 
@@ -82,18 +82,34 @@ def create_model(learning_rate=0.01, momentum=0.0):
     return model
 
 # Wrap the model
-model = KerasRegressor(model=create_model, epochs=10, batch_size=200, verbose=0)
+model = KerasRegressor(model=create_model, epochs=10, batch_size=200, verbose=0,
+                       validation_split=0.2)  # needed so history has val_loss / val_mse
 
 # Define the grid search parameters
-param_grid = {
-    'model__learning_rate': [0.01, 0.1, 0.2],
-    'model__momentum': [0.0, 0.5, 0.9],
-    'epochs': [10, 50, 100],
-    'batch_size': [50, 100, 200]
-}
+QUICK_TEST = True  # set to False for the full search
 
-# Perform grid search
-grid = GridSearchCV(estimator=model, param_grid=param_grid, scoring='neg_mean_squared_error', cv=3)
+if QUICK_TEST:
+    # 2 combinations x 2 folds = 4 short trainings
+    param_grid = {
+        'model__learning_rate': [0.01, 0.1],
+        'model__momentum': [0.9],
+        'epochs': [10],
+        'batch_size': [200]
+    }
+    cv_folds = 2
+else:
+    # 81 combinations x 3 folds = 243 trainings
+    param_grid = {
+        'model__learning_rate': [0.01, 0.1, 0.2],
+        'model__momentum': [0.0, 0.5, 0.9],
+        'epochs': [10, 50, 100],
+        'batch_size': [50, 100, 200]
+    }
+    cv_folds = 3
+
+# Perform grid search (n_jobs=-1 uses all CPU cores)
+grid = GridSearchCV(estimator=model, param_grid=param_grid, scoring='neg_mean_squared_error',
+                    cv=cv_folds, n_jobs=-1)
 grid_result = grid.fit(xtrain, ytrain)
 
 # Print the best parameters
