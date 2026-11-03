@@ -86,7 +86,7 @@ model = KerasRegressor(model=create_model, epochs=10, batch_size=200, verbose=0,
                        validation_split=0.2)  # needed so history has val_loss / val_mse
 
 # Define the grid search parameters
-QUICK_TEST = True  # set to False for the full search
+QUICK_TEST = False  # set to False for the full search
 
 if QUICK_TEST:
     # 2 combinations x 2 folds = 4 short trainings
