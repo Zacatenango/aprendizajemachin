@@ -18,10 +18,10 @@ from keras.preprocessing import image
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
-path = '/home/usuario/programacion/ITESO/semestre3/datasets/doggos/'
+path = '/home/usuario/programacion/ITESO/semestre3/datasets/doggos/images/Images'
 
 #RECOMENDATION!  create a "test" folder to store two folders from Images: n02085620-Chihuahua  and n02085782-Japanese_spaniel as an example.
-path = '/home/usuario/programacion/ITESO/semestre3/datasets/doggos_test/'  
+path = '/home/usuario/programacion/ITESO/semestre3/datasets/doggos_test/images/Images'  
 
 images = [] # Images of all breeds
 labels = [] # Labels to indetify the breed
@@ -224,190 +224,97 @@ print(f'Accuracy Test: {accuracy:.2f}')
 
 
 #%%
-import requests, base64
-from PIL import Image
-import json
+# Ask vision-language models (VLMs) hosted by NVIDIA for the breed of a dog.
+#
+# The old per-model endpoints (https://ai.api.nvidia.com/v1/vlm/nvidia/neva-22b
+# and .../microsoft/kosmos-2) are deprecated. NVIDIA now serves its models through
+# one OpenAI-compatible endpoint: you pick the model with the "model" field and
+# send the image as an "image_url" content part instead of an <img> HTML tag.
+#
+# Get a key at https://build.nvidia.com and set it before running, e.g.:
+#   export NVIDIA_API_KEY="nvapi-..."
+import os
+import base64
+import requests
 
-invoke_url = "https://ai.api.nvidia.com/v1/vlm/nvidia/neva-22b"
-stream = False
+INVOKE_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 
-im = Image.open('dog_images/Images/n02088466-bloodhound/n02088466_1262.jpg')
-im.save('Bloodhunt.png')
+# Replacements for NeVA-22B and Kosmos-2. Any vision model listed at
+# https://integrate.api.nvidia.com/v1/models works here.
+MODEL_A = "meta/llama-3.2-11b-vision-instruct"
+MODEL_B = "meta/llama-3.2-90b-vision-instruct"
 
-with open("Bloodhunt.png", "rb") as f:
-    image_b64 = base64.b64encode(f.read()).decode()
+DATASETS_DIR = '/home/usuario/programacion/ITESO/semestre3/datasets'
+BLOODHOUND_IMG = os.path.join(DATASETS_DIR, 'doggos_test/images/Images/n02088466-bloodhound/n02088466_1262.jpg')
+# The Yorkshire terrier folder is only in the full dataset, not in doggos_test
+YORKSHIRE_IMG = os.path.join(DATASETS_DIR, 'doggos/images/Images/n02094433-Yorkshire_terrier/n02094433_2401.jpg')
 
-headers = {
-  "Authorization": "Bearer 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",
-  "Accept": "text/event-stream" if stream else "application/json"
-}
+BLOODHOUND_BREEDS = ["bloodhound", "bloodhounds"]
+YORKSHIRE_BREEDS = ["yorkshire", "yorkshires", "yorkie", "terrier"]
 
-# We will ask the breed of the picture to the model
 
-payload = {
-  "messages": [
-    {
-      "role": "user",
-      "content": f'What is the breed of this dog. <img src="data:image/png;base64,{image_b64}" />'
+def ask_breed(model, image_path, breeds):
+    """Ask `model` for the dog's breed and check whether the answer names one of `breeds`."""
+    if not NVIDIA_API_KEY:
+        raise RuntimeError("Set the NVIDIA_API_KEY environment variable first.")
+
+    with open(image_path, "rb") as f:
+        image_b64 = base64.b64encode(f.read()).decode()
+
+    headers = {
+        "Authorization": f"Bearer {NVIDIA_API_KEY}",
+        "Accept": "application/json",
     }
-  ],
-  "max_tokens": 1024,
-  "temperature": 0.20,
-  "top_p": 0.70,
-  "seed": 0,
-  "stream": stream
-}
 
-# Use Neva 22b to determine a dog breed
-response = requests.post(invoke_url, headers=headers, json=payload)
-result = ""
-breeds = ["bloodhunt", "bloodhunts"]
+    # We will ask the breed of the picture to the model
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "What is the breed of this dog?"},
+                    {"type": "image_url",
+                     "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}},
+                ],
+            }
+        ],
+        "max_tokens": 1024,
+        "temperature": 0.20,
+        "top_p": 0.70,
+        "seed": 0,
+        "stream": False,
+    }
 
-# Figure out if we found the correct breed of the dog
-if response.status_code == 200:
-    json_data = response.json()
-    result = json_data['choices'][0]['message']['content'].lower().replace(" ", "")
-    
-    if any(breed in result.lower().replace(" ", "") for breed in breeds):
-        print(result)
+    response = requests.post(INVOKE_URL, headers=headers, json=payload, timeout=120)
+
+    # Figure out if we found the correct breed of the dog
+    if response.status_code != 200:
+        print(f"[{model}] POST failed with code {response.status_code}: {response.text}")
+        return None
+
+    result = response.json()['choices'][0]['message']['content']
+    normalized = result.lower().replace(" ", "")
+    if any(breed in normalized for breed in breeds):
+        print(f"[{model}] {result}")
     else:
-        print("We couldn't determine that the dog was a " + breeds[0])
-else:
-    print("POST Error failed with code: ", response.status_code)
-    
-    
+        print(f"[{model}] We couldn't determine that the dog was a {breeds[0]}. Answer: {result}")
+    return result
+
+
 #%%
-invoke_url = "https://ai.api.nvidia.com/v1/vlm/nvidia/neva-22b"
-stream = False
+# Model A on the bloodhound
+ask_breed(MODEL_A, BLOODHOUND_IMG, BLOODHOUND_BREEDS)
 
-im = Image.open('dog_images/Images/n02094433-Yorkshire_terrier/n02094433_2401.jpg')
-im.save('Yorkshire.png')
-
-with open("Yorkshire.png", "rb") as f:
-    image_b64 = base64.b64encode(f.read()).decode()
-
-headers = {
-  "Authorization": "Bearer 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",
-  "Accept": "text/event-stream" if stream else "application/json"
-}
-
-# We will ask the breed of the picture to the model
-payload = {
-  "messages": [
-    {
-      "role": "user",
-      "content": f'What is the breed of this dog. <img src="data:image/png;base64,{image_b64}" />'
-    }
-  ],
-  "max_tokens": 1024,
-  "temperature": 0.20,
-  "top_p": 0.70,
-  "seed": 0,
-  "stream": stream
-}
-
-# Use Neva 22b to determine a dog breed
-response = requests.post(invoke_url, headers=headers, json=payload)
-result = ""
-breeds = ["yorkshire", "yorkshires", "yorkie", "terrier"]
-
-# Figure out if we found the correct breed of the dog
-if response.status_code == 200:
-    json_data = response.json()
-    result = json_data['choices'][0]['message']['content'].lower().replace(" ", "")
-    
-    if any(breed in result.lower().replace(" ", "") for breed in breeds):
-        print(result)
-    else:
-        print("We couldn't determine that the dog was a " + breeds[0])
-else:
-    print("POST Error failed with code: ", response.status_code)
-    
-    
 #%%
-import requests, base64
-from PIL import Image
+# Model A on the Yorkshire terrier
+ask_breed(MODEL_A, YORKSHIRE_IMG, YORKSHIRE_BREEDS)
 
-invoke_url = "https://ai.api.nvidia.com/v1/vlm/microsoft/kosmos-2"
-
-with open("Bloodhunt.png", "rb") as f:
-    image_b64 = base64.b64encode(f.read()).decode()
-
-headers = {
-  "Authorization": "Bearer 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",
-  "Accept": "application/json"
-}
-
-# We will ask the breed of the picture to the model
-payload = {
-  "messages": [
-    {
-      "role": "user",
-      "content": f'What is the breed of this dog. <img src="data:image/png;base64,{image_b64}" />'
-    }
-  ],
-  "max_tokens": 1024,
-  "temperature": 0.20,
-  "top_p": 0.20,
-}
-
-# Use Neva 22b to determine a dog breed
-response = requests.post(invoke_url, headers=headers, json=payload)
-result = ""
-breeds = ["bloodhount", "bloodhounds"]
-
-# Figure out if we found the correct breed of the dog
-if response.status_code == 200:
-    json_data = response.json()
-    result = json_data['choices'][0]['message']['content']
-
-    if any(breed in result.lower().replace(" ", "") for breed in breeds):
-        print(result)
-    else:
-        print("We couldn't determine that the dog was a " + breeds[0])
-else:
-    print("POST Error failed with code: ", response.status_code)
-    
 #%%
-import requests, base64
-from PIL import Image
+# Model B on the bloodhound
+ask_breed(MODEL_B, BLOODHOUND_IMG, BLOODHOUND_BREEDS)
 
-invoke_url = "https://ai.api.nvidia.com/v1/vlm/microsoft/kosmos-2"
-
-with open("Yorkshire.png", "rb") as f:
-    image_b64 = base64.b64encode(f.read()).decode()
-
-headers = {
-  "Authorization": "Bearer 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",
-  "Accept": "application/json"
-}
-
-# We will ask the breed of the picture to the model
-payload = {
-  "messages": [
-    {
-      "role": "user",
-      "content": f'What is the breed of this dog. <img src="data:image/png;base64,{image_b64}" />'
-    }
-  ],
-  "max_tokens": 1024,
-  "temperature": 0.20,
-  "top_p": 0.20,
-}
-
-# Use Neva 22b to determine a dog breed
-response = requests.post(invoke_url, headers=headers, json=payload)
-result = ""
-breeds = ["yorkshire", "yorkshires", "yorkie", "terrier"]
-
-# Figure out if we found the correct breed of the dog
-if response.status_code == 200:
-    json_data = response.json()
-    result = json_data['choices'][0]['message']['content']
-
-    if any(breed in result.lower().replace(" ", "") for breed in breeds):
-        print(result)
-    else:
-        print("We couldn't determine that the dog was a " + breeds[0])
-else:
-    print("POST Error failed with code: ", response.status_code)
+#%%
+# Model B on the Yorkshire terrier
+ask_breed(MODEL_B, YORKSHIRE_IMG, YORKSHIRE_BREEDS)
