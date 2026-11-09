@@ -125,8 +125,8 @@ model = Sequential([
     # Input layer: Specify the shape of the input data (100x100 RGB image)
     Input(shape=(100, 100, 3)),  # input_shape specifies the shape of the input data (100x100 RGB image)
     #HIGHLY RECOMMENDED TO ADD CONVOLUTION HIDDEN LAYER ( UNCOMMENTLINES BELOW)
-    #Conv2D(32, (3, 3), activation='relu', input_shape=(100, 100, 3)), 
-    Flatten(),  # Flatten layer to convert 2D image to 1D array. Flatten layer: Convert the 2D image to a 1D array
+    Conv2D(32, (3, 3), activation='relu', input_shape=(100, 100, 3)), 
+    Flatten(),  # Flatten layer to convert 2D image to 1D array
         
     # Hidden layer: Fully connected layer with 128 neurons and ReLU activation function
     Dense(10, activation='relu'),  # 100 is the number of neurons in the hidden layer, 'relu' is the activation function
@@ -141,7 +141,7 @@ model.summary()
 
 # Compile the model
 model.compile(optimizer='sgd', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10)
+model.fit(X_train, y_train, epochs=100)
 
 test_p = model.predict(X_test)
 y_pred = np.argmax(test_p, axis=1)
@@ -165,7 +165,7 @@ model = Sequential([
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10)
+model.fit(X_train, y_train, epochs=100)
 
 test_p = model.predict(X_test)
 y_pred = np.argmax(test_p, axis=1)
@@ -189,7 +189,7 @@ model = Sequential([
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10)
+model.fit(X_train, y_train, epochs=100)
 
 test_p = model.predict(X_test)
 y_pred = np.argmax(test_p, axis=1)
@@ -213,7 +213,7 @@ model = Sequential([
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10)
+model.fit(X_train, y_train, epochs=100)
 
 test_p = model.predict(X_test)
 y_pred = np.argmax(test_p, axis=1)
