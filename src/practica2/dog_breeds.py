@@ -9,9 +9,11 @@ import keras
 from keras import layers
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
-DATA_DIR = sys.argv[1] if len(sys.argv) > 1 else "stanford-dogs-dataset"
-MY_DOG = sys.argv[2] if len(sys.argv) > 2 else None
-N_BREEDS, IMG, BATCH, SEED = 10, 160, 32, 297974
+# DATA_DIR = "/home/usuario/programacion/ITESO/semestre3/datasets/doggos_test/images/Images/"  # Testing
+DATA_DIR = "/home/usuario/programacion/ITESO/semestre3/datasets/doggos/images/Images/"  # Production
+MY_DOG = sys.argv[2] if len(sys.argv) > 2 else "/home/usuario/programacion/ITESO/semestre3/datasets/doggos/images/Images/n02107142-Doberman/n02107142_10009.jpg"
+#N_BREEDS, IMG, BATCH, SEED = 3, 160, 32, 297974   # 3 breeds used for testing as discussed in class
+N_BREEDS, IMG, BATCH, SEED = 10, 160, 32, 297974   # 10 breeds for Production
 keras.utils.set_random_seed(SEED)
 
 #%%
@@ -22,7 +24,7 @@ def find_breed_root(path):
         if sum(d.startswith("n0") and "-" in d for d in dirs) >= N_BREEDS:
             return root
     raise FileNotFoundError(f"No breed folders found under {path}")
-
+0.00
 root = find_breed_root(DATA_DIR)
 folders = sorted(d for d in os.listdir(root) if d.startswith("n0"))[:N_BREEDS]   # first 10 breeds
 breed_names = [f.split("-", 1)[1].replace("_", " ") for f in folders]           # readable labels
